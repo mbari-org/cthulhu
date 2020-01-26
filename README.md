@@ -20,7 +20,7 @@ environment.
 
 Getting the source:
 ```
-FIXME PENDING
+git clone git@github.com:caprica/cthulu.git
 ```
 
 You should _not_ rely on the stability of this repository and you are on your own if you decide to fork it at the
@@ -121,7 +121,7 @@ stop the media player during the application exit processing. Other file types a
 
 ## Copyright and Acknowledgements
 
-Software development services provided by [capricasoftware.co.uk](capricasoftware.co.uk)
+Software development services provided by [capricasoftware.co.uk](http://capricasoftware.co.uk)
 
 Icons from [MaterialUI](https://material.io/resources/icons) licensed under [Apache license version 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
 

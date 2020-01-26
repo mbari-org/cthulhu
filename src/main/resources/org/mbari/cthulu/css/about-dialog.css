@@ -1,0 +1,27 @@
+.about-dialog {
+    -fx-background-color: '#1a191a';
+    -fx-pref-width: 500;
+}
+
+.about-dialog .label {
+    -fx-text-fill: '#939598';
+}
+
+.about-dialog .label.heading {
+    -fx-font-weight: bold;
+}
+
+.about-dialog .button {
+    -fx-background-color: transparent;
+    -fx-border-color: '#939598';
+    -fx-border-width: 1;
+    -fx-text-fill: '#939598';
+}
+
+.about-dialog .button:focused {
+    -fx-border-color: '#3d6185';
+}
+
+.about-dialog .button:hover {
+    -fx-text-fill: 'white';
+}

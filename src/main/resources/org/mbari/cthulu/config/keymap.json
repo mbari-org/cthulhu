@@ -1,0 +1,10 @@
+{
+  "playPause" : ["space", "h"],
+  "shortSkip" : ["j"],
+  "normalSkip": ["k"],
+  "longSkip"  : ["l"],
+  "shortBack" : ["g"],
+  "normalBack": ["f"],
+  "longBack"  : ["d"],
+  "nextFrame" : ["n"]
+}

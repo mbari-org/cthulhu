@@ -1,0 +1,5 @@
+{
+    "libVlcArgs": [
+        "--no-osd"
+    ]
+}

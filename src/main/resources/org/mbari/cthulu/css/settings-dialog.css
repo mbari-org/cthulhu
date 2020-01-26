@@ -1,0 +1,158 @@
+.settings-dialog {
+    -fx-padding: 0;
+    -fx-background-color: '#1a191a';
+    -fx-pref-width: 800;
+}
+
+.settings-dialog .split-pane {
+    -fx-background-color: '#1a191a';
+    -fx-padding: 0;
+    -fx-border-color: '#323232';
+    -fx-border-width: 0 0 1 0;
+}
+
+.settings-dialog .split-pane .split-pane-divider {
+    -fx-background-color: '#323232';
+    -fx-pref-width: 1;
+}
+
+.settings-dialog .list-view {
+}
+
+.settings-dialog .list-cell {
+    -fx-background-color: '#3e434c';
+    -fx-text-fill: '#adadad';
+    -fx-font-weight: bold;
+}
+
+.settings-dialog .list-cell:selected {
+    -fx-background-color: '#2f65ca';
+}
+
+.settings-dialog .button-bar {
+      -fx-background-color: '#3c3f41';
+}
+
+.settings-dialog .button {
+    -fx-background-color: transparent;
+    -fx-border-color: '#939598';
+    -fx-border-width: 1;
+    -fx-text-fill: '#939598';
+}
+
+.settings-dialog .button:focused {
+    -fx-border-color: '#3d6185';
+}
+
+.settings-dialog .button:hover {
+    -fx-text-fill: 'white';
+}
+
+.settings-dialog .settings-content {
+    -fx-background-color: '#3c3f41';
+    -fx-border-color: transparent;
+    -fx-padding: 4;
+}
+
+.settings-dialog .settings-content .heading {
+    -fx-text-fill: '#b8b6af';
+    -fx-font-weight: bold;
+}
+
+.settings-dialog .settings-content .label {
+    -fx-text-fill: '#b8b6af';
+}
+
+.settings-dialog .settings-content .label.item-text {
+}
+
+.settings-dialog .settings-content .label.help-text {
+    -fx-text-fill: '#7c7c7c';
+}
+
+.settings-dialog .settings-content .section {
+}
+
+.settings-dialog .settings-content .section .label {
+}
+
+.settings-dialog .settings-content .section .separator .line {
+    -fx-border-color: '#515151';
+    -fx-border-width: 1;
+}
+
+.settings-dialog .settings-content .text-field {
+    -fx-background-color: '#45494a';
+    -fx-text-fill: '#b8b6af';
+    -fx-accent: '#2f65ca';
+    -fx-border-color: '#646464';
+}
+
+.settings-dialog .settings-content .text-field:focused {
+    -fx-border-color: '#3d6185';
+}
+
+.settings-dialog .check-box {
+    -fx-background-color: '#3c3f41';
+    -fx-text-fill: '#b8b6af';
+    -fx-mark-color: '#b8b6af';
+}
+
+.settings-dialog .check-box > .box {
+    -fx-background-color: '#45494a';
+    -fx-border-color: '#646464';
+}
+
+.settings-dialog .check-box:focused > .box {
+    -fx-border-color: '#3d6185';
+}
+
+.settings-dialog .check-box:selected > .box {
+    -fx-background-color: '#45494a';
+}
+
+.settings-dialog .check-box:selected > .box > .mark,
+.settings-dialog .check-box:indeterminate  > .box > .mark {
+}
+
+.settings-dialog .choice-box {
+    -fx-background-color: '#45494a';
+    -fx-text-fill: '#b8b6af';
+    -fx-border-color: '#646464';
+    -fx-mark-color: '#b8b6af';
+}
+
+.settings-dialog .choice-box:focused {
+    -fx-border-color: '#3d6185';
+}
+
+.settings-dialog .choice-box > .label {
+    -fx-text-fill: '#b8b6af';
+}
+
+.settings-dialog .settings-content .choice-box .context-menu {
+    -fx-background-color: '#45494a';
+    -fx-text-fill: '#b8b6af';
+}
+
+.settings-dialog .settings-content .choice-box .menu-item:focused {
+    -fx-background-color: '#2f65ca';
+    -fx-text-fill: '#b8b6af';
+}
+
+.settings-dialog .settings-content .choice-box .menu-item > .label {
+}
+
+.settings-dialog .settings-content .choice-box .menu-item:focused > .label {
+ }
+
+.settings-dialog .settings-content .color-picker {
+    -fx-background-color: '#45494a';
+    -fx-text-fill: '#b8b6af';
+    -fx-border-color: '#646464';
+    -fx-mark-color: '#b8b6af';
+}
+
+.settings-dialog .settings-content .color-picker:focused {
+    -fx-border-color: '#3d6185';
+}

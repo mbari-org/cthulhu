@@ -1,0 +1,5 @@
+Copyright © MBARI 2020
+
+MBARI license PENDING...
+
+MBRARI Cthulu uses vlcj, which is licensed under GPL 3.0+.

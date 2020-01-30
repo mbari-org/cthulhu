@@ -137,7 +137,7 @@ public final class PlayerComponent {
             @Override
             public void lengthChanged(MediaPlayer mediaPlayer, long newLength) {
                 log.debug("lengthChanged(newLength={})", newLength);
-                setLength(length);
+                setLength(newLength);
             }
 
             @Override

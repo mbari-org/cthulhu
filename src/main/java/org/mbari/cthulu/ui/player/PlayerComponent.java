@@ -243,7 +243,7 @@ public final class PlayerComponent {
      *
      * @return event source
      */
-    MediaPlayerEventSource eventSource() {
+    public MediaPlayerEventSource eventSource() {
         return mediaPlayerEventSource;
     }
 
@@ -261,7 +261,9 @@ public final class PlayerComponent {
      *
      * @param newTime new time, milliseconds from the start of the media
      */
-    void setTime(long newTime) {
+    public void setTime(long newTime) {
+        log.trace("setTime(newTime={})", newTime);
+
         mediaPlayer.controls().setTime(newTime);
 
         mediaPlayerEventSource.newTime(newTime);

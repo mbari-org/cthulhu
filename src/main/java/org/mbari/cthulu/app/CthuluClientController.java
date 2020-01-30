@@ -122,10 +122,12 @@ final class CthuluClientController implements ClientController {
     public boolean seekElapsedTime(UUID uuid, Duration duration) {
         log.debug("seekElapsedTime(uuid={}, duration={})", uuid, duration);
         return application().playerComponents().get(uuid)
-            .map(playerComponent -> {
-                playerComponent.mediaPlayer().controls().setTime(duration.toMillis());
-                return true;
-            }).orElse(false);
+            .map(playerComponent ->
+                platformExecute(() -> {
+                    playerComponent.setTime(duration.toMillis());
+                    return true;
+                })
+            ).orElse(false);
     }
 
     @Override

@@ -123,10 +123,7 @@ final class CthuluClientController implements ClientController {
         log.debug("seekElapsedTime(uuid={}, duration={})", uuid, duration);
         return application().playerComponents().get(uuid)
             .map(playerComponent ->
-                platformExecute(() -> {
-                    playerComponent.setTime(duration.toMillis());
-                    return true;
-                })
+                platformExecute(() -> playerComponent.setTime(duration.toMillis()))
             ).orElse(false);
     }
 

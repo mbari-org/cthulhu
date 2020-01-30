@@ -261,15 +261,21 @@ public final class PlayerComponent {
      *
      * @param newTime new time, milliseconds from the start of the media
      */
-    public void setTime(long newTime) {
+    public boolean setTime(long newTime) {
         log.trace("setTime(newTime={})", newTime);
 
-        mediaPlayer.controls().setTime(newTime);
+        if (newTime >= 0 && newTime <= length) {
+            mediaPlayer.controls().setTime(newTime);
 
-        mediaPlayerEventSource.newTime(newTime);
-        if (!mediaPlayer.status().isPlaying()) {
-            mediaPlayerEventSource.newPosition(mediaPlayer.status().position());
+            mediaPlayerEventSource.newTime(newTime);
+            if (!mediaPlayer.status().isPlaying()) {
+                mediaPlayerEventSource.newPosition(mediaPlayer.status().position());
+            }
+
+            return true;
         }
+
+        return false;
     }
 
     @Override

@@ -49,7 +49,7 @@
         <javafx.version>13.0.2</javafx.version>
         <logback.version>1.2.3</logback.version>
         <miglayout.version>5.2</miglayout.version>
-        <rxjava.version>3.0.0-RC8</rxjava.version>
+        <rxjava.version>3.0.0-RC9</rxjava.version>
         <vcr4j.version>4.2.3.jre11</vcr4j.version>
         <vlcj.version>4.3.0</vlcj.version>
         <vlcjFileFilters.version>2.0.0</vlcjFileFilters.version>

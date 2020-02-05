@@ -2,10 +2,12 @@ package org.mbari.cthulu;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
+import org.mbari.cthulu.ui.main.MainStage;
 import org.mbari.cthulu.ui.player.PlayerComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
@@ -27,24 +29,28 @@ public class CthuluLauncher extends Application {
         log.info(banner());
     }
 
+    private Stage stage;
+
     @Override
     public final void start(Stage primaryStage) {
         log.debug("start()");
 
-        PlayerComponent playerComponent = application().open();
+        this.stage = new MainStage();
 
-        // If a command-line argument was specified, assume it's an MRL and try and play it
+        // If command-line arguments were specified, assume they are MRL and try and play them
         List<String> params = getParameters().getRaw();
-        if (!params.isEmpty()) {
-            String mrl = params.get(0);
-            log.debug("mrl={}", mrl);
-            playerComponent.mediaPlayer().media().play(mrl);
-        }
+        params.forEach(CthuluLauncher::openFile);
     }
 
     @Override
     public final void stop() {
         log.debug("stop()");
+
+        application().settings().state().position(
+            (int) Math.round(stage.getX()),
+            (int) Math.round(stage.getY())
+        );
+
         application().saveSettings();
     }
 
@@ -55,5 +61,16 @@ public class CthuluLauncher extends Application {
      */
     public static void main(String[] args) {
         launch(args);
+    }
+
+    /**
+     * Open a file in a new media player component.
+     *
+     * @param file file to open
+     */
+    private static void openFile(String file) {
+        log.debug("openFile(file={})", file);
+        PlayerComponent playerComponent = application().open();
+        playerComponent.mediaPlayer().media().play(file);
     }
 }

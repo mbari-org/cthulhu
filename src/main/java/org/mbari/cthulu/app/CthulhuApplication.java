@@ -205,10 +205,6 @@ final public class CthulhuApplication {
     public void close(UUID uuid) {
         log.debug("close(uuid={})", uuid);
         playerComponents.close(uuid);
-        if (playerComponents.empty()) {
-            log.debug("no more player components");
-            close();
-        }
     }
 
     /**
@@ -217,6 +213,12 @@ final public class CthulhuApplication {
     public void saveSettings() {
         log.debug("saveSettings()");
         settingsManager().write(settings);
+    }
+
+    public void quit() {
+        log.debug("quit()");
+        playerComponents.closeAll();
+        close();
     }
 
     /**

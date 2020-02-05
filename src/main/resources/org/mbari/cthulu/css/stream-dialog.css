@@ -1,0 +1,57 @@
+.stream-dialog {
+    -fx-pref-width: 800;
+}
+
+.stream-dialog .button-bar {
+    -fx-background-color: '#3c3f41';
+    -fx-border-color: '#323232';
+    -fx-border-width: 1 0 0 0;
+}
+
+.stream-dialog .button {
+    -fx-background-color: transparent;
+    -fx-border-color: '#939598';
+    -fx-border-width: 1;
+    -fx-text-fill: '#939598';
+}
+
+.stream-dialog .button:focused {
+    -fx-border-color: '#3d6185';
+}
+
+.stream-dialog .button:hover {
+    -fx-text-fill: 'white';
+}
+
+.stream-dialog .content {
+    -fx-background-color: '#3c3f41';
+    -fx-border-color: transparent;
+    -fx-padding: 24 16;
+}
+
+.stream-dialog .content .heading {
+    -fx-text-fill: '#b8b6af';
+    -fx-font-weight: bold;
+}
+
+.stream-dialog .content .label {
+    -fx-text-fill: '#b8b6af';
+}
+
+.stream-dialog .content .label.item-text {
+}
+
+.stream-dialog .content .label.help-text {
+    -fx-text-fill: '#7c7c7c';
+}
+
+.stream-dialog .content .text-field {
+    -fx-background-color: '#45494a';
+    -fx-text-fill: '#b8b6af';
+    -fx-accent: '#2f65ca';
+    -fx-border-color: '#646464';
+}
+
+.stream-dialog .content .text-field:focused {
+    -fx-border-color: '#3d6185';
+}

@@ -2,6 +2,23 @@
     -fx-background-color: 'black';
 }
 
+.app-buttons {
+    -fx-background-color: '#1a191a';
+    -fx-padding: 8;
+    -fx-hgap: 8;
+}
+
+.app-button {
+    -fx-width: 64;
+    -fx-height: 64;
+    -fx-background-color: '#1a191a';
+    -fx-opacity: 0.54;
+}
+
+.app-button:hover {
+    -fx-opacity: 1.0;
+}
+
 .media-player-controls {
     -fx-background-color: '#1a191a';
     -fx-border-width: 1 0 0 0;

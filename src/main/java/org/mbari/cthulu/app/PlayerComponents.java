@@ -93,6 +93,15 @@ final class PlayerComponents {
     }
 
     /**
+     * Close all player components.
+     */
+    void closeAll() {
+        log.debug("closeAll()");
+        playerComponents.values().forEach(PlayerComponent::close);
+        playerComponents.clear();
+    }
+
+    /**
      * Show a player component.
      *
      * @param uuid unique identifier of the player component to close

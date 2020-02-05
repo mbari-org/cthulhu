@@ -7,12 +7,15 @@ import static com.google.common.base.MoreObjects.toStringHelper;
  */
 final public class UserInterface {
 
+    private boolean rememberWindowPosition;
+
     private boolean rememberWindowSize;
 
     /**
      * Create settings with default values.
      */
     public UserInterface() {
+        this.rememberWindowPosition = true;
         this.rememberWindowSize = false;
     }
 
@@ -22,7 +25,16 @@ final public class UserInterface {
      * @param from settings to copy
      */
     public UserInterface(UserInterface from) {
+        this.rememberWindowPosition = from.rememberWindowPosition;
         this.rememberWindowSize = from.rememberWindowSize;
+    }
+
+    public boolean rememberWindowPosition() {
+        return rememberWindowPosition;
+    }
+
+    public void rememberWindowPosition(boolean rememberWindowPosition) {
+        this.rememberWindowPosition = rememberWindowPosition;
     }
 
     public boolean rememberWindowSize() {
@@ -36,6 +48,7 @@ final public class UserInterface {
     @Override
     public String toString() {
         return toStringHelper(this)
+            .add("rememberWindowPosition", rememberWindowPosition)
             .add("rememberWindowSize", rememberWindowSize)
             .toString();
     }

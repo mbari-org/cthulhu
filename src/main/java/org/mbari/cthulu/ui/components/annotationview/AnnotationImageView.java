@@ -1,6 +1,7 @@
 package org.mbari.cthulu.ui.components.annotationview;
 
 import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -111,6 +112,18 @@ public class AnnotationImageView extends ResizableImageView {
         double x = event.getX();
         double y = event.getY();
 
+        // Constrain the drag rectangle the display bounds of the underlying video view
+        Bounds videoViewBounds = videoViewBounds();
+
+        // Tighten the constraint to prevent the border being drawn outside the image
+        int borderSize = application().settings().annotations().creation().borderSize();
+
+        x = Math.min(x, videoViewBounds.getWidth() - borderSize);
+        x = Math.max(x, borderSize);
+
+        y = Math.min(y, videoViewBounds.getHeight() - borderSize);
+        y = Math.max(y, borderSize);
+
         dragRectangle.setWidth(Math.abs(x - anchorX));
         dragRectangle.setHeight(Math.abs(y - anchorY));
         dragRectangle.setX(Math.min(anchorX, x));
@@ -118,8 +131,6 @@ public class AnnotationImageView extends ResizableImageView {
 
         cursorRectangle.setX(x);
         cursorRectangle.setY(y);
-
-        // FIXME we want to limit the drag to inside the imageview
     }
 
     private void mouseReleased(MouseEvent event) {

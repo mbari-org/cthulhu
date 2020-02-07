@@ -199,6 +199,17 @@ public class ResizableImageView extends Pane {
     }
 
     /**
+     * Return the bounds of the video view within this container.
+     * <p>
+     * These bounds reflect the size of the video itself, ignoring any black bars.
+     *
+     * @return video view bounds
+     */
+    protected final Bounds videoViewBounds() {
+        return imageView.getBoundsInParent();
+    }
+
+    /**
      * Invoked for sub-classes to provide their own behaviours after a resize.
      */
     protected void onNewSize() {

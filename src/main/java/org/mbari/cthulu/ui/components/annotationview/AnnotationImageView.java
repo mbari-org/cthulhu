@@ -2,6 +2,8 @@ package org.mbari.cthulu.ui.components.annotationview;
 
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -34,6 +36,8 @@ public class AnnotationImageView extends ResizableImageView {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotationImageView.class);
 
+    private static final KeyCode CANCEL_DRAG_KEY_CODE = KeyCode.ESCAPE;
+
     private final Rectangle cursorRectangle = createCursorRectangle();
 
     private final Rectangle dragRectangle = createDragRectangle();
@@ -52,9 +56,11 @@ public class AnnotationImageView extends ResizableImageView {
 
     /**
      * Anchor coordinate for mouse drags.
+     * <p>
+     * A value of -1 means that the drag is not active.
      */
-    private double anchorX;
-    private double anchorY;
+    private double anchorX = -1d;
+    private double anchorY = -1d;
 
     /**
      * Create a view with an interactive overlay for creating video annotations.
@@ -78,6 +84,8 @@ public class AnnotationImageView extends ResizableImageView {
         imageView.setOnMousePressed(this::mousePressed);
         imageView.setOnMouseDragged(this::mouseDragged);
         imageView.setOnMouseReleased(this::mouseReleased);
+
+        setOnKeyPressed(this::keyPressed);
 
         application().settingsChanged().subscribe(this::settingsChanged);
     }
@@ -109,6 +117,10 @@ public class AnnotationImageView extends ResizableImageView {
     };
 
     private void mouseDragged(MouseEvent event) {
+        if (anchorX == -1) {
+            return;
+        }
+
         double x = event.getX();
         double y = event.getY();
 
@@ -134,9 +146,21 @@ public class AnnotationImageView extends ResizableImageView {
     }
 
     private void mouseReleased(MouseEvent event) {
+        if (anchorX == -1) {
+            return;
+        }
+
         dragRectangle.setVisible(false);
         if (dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
             newAnnotation();
+            anchorX = anchorY = -1d;
+        }
+    }
+
+    private void keyPressed(KeyEvent event) {
+        if (dragRectangle.isVisible() && CANCEL_DRAG_KEY_CODE == event.getCode()) {
+            dragRectangle.setVisible(false);
+            anchorX = anchorY = -1d;
         }
     }
 

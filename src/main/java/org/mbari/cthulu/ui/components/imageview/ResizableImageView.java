@@ -195,7 +195,7 @@ public class ResizableImageView extends Pane {
      * @return translated absolute image Y value
      */
     private double displayToAbsoluteY(double value) {
-        return value * this.scaleX;
+        return value * this.scaleY;
     }
 
     /**

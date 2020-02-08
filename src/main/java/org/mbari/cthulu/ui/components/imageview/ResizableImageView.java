@@ -50,6 +50,16 @@ public class ResizableImageView extends Pane {
     private double scaleY;
 
     /**
+     * Previous value of the width of this container.
+     */
+    private double lastWidth = -1;
+
+    /**
+     * Previous value of the height of this container.
+     */
+    private double lastHeight = -1;
+
+    /**
      * Create a wrapper for a resizable {@link ImageView}.
      *
      * @param imageView the component to wrap
@@ -66,9 +76,18 @@ public class ResizableImageView extends Pane {
      * Register the event handlers necessary to react to changes in component size.
      */
     private void registerEventHandlers() {
-        imageView.imageProperty().addListener((observableValue, oldValue, newValue) -> sizeChanged());
+        imageView.imageProperty().addListener((observableValue, oldValue, newValue) -> imageChanged());
         imageView.fitWidthProperty().addListener((observableValue, oldValue, newValue) -> sizeChanged());
         imageView.fitHeightProperty().addListener((observableValue, oldValue, newValue) -> sizeChanged());
+    }
+
+    /**
+     * Invoked when the image of the contained {@link ImageView} has changed (this will occur each time new media is
+     * played).
+     */
+    private void imageChanged() {
+        log.trace("imageChanged()");
+        lastWidth = lastHeight = -1;
     }
 
     /**
@@ -105,11 +124,21 @@ public class ResizableImageView extends Pane {
 
     @Override
     protected final void layoutChildren() {
+        // This method is called every "tick" whether the size has changed or not, Only perform new layout if the size
+        // changed since last time
+        double width = getWidth();
+        double height = getHeight();
+        if (lastWidth == width && lastHeight == height) {
+            return;
+        }
+        lastWidth = width;
+        lastHeight = height;
+
         // Fit the image view to match this container, the aspect ratio will be preserved
-        imageView.setFitWidth(getWidth());
-        imageView.setFitHeight(getHeight());
+        imageView.setFitWidth(width);
+        imageView.setFitHeight(height);
         // Adjust the image view origin to center within this container
-        layoutInArea(this.imageView, 0, 0, getWidth(), getHeight(), 0, HPos.CENTER, VPos.CENTER);
+        layoutInArea(this.imageView, 0, 0, width, height, 0, HPos.CENTER, VPos.CENTER);
         // Offset the other children so they are positioned relative to the image view rather than this container
         getChildren().stream().filter(child -> child != imageView).forEach(child -> {
             child.setTranslateX(imageView.getLayoutX());

@@ -15,11 +15,14 @@ final public class State {
 
     private int windowHeight;
 
+    private String openDialogDirectory;
+
     public State() {
         this.windowX = 300;
         this.windowY = 300;
         this.windowWidth = 1100;
         this.windowHeight = 770;
+        this.openDialogDirectory = ".";
     }
 
     public State(State from) {
@@ -27,6 +30,7 @@ final public class State {
         this.windowY = from.windowY;
         this.windowWidth = from.windowWidth;
         this.windowHeight = from.windowHeight;
+        this.openDialogDirectory = from.openDialogDirectory;
     }
 
     public int windowX() {
@@ -45,6 +49,10 @@ final public class State {
         return windowHeight;
     }
 
+    public String openDialogDirectory() {
+        return openDialogDirectory;
+    }
+
     public void position(int windowX, int windowY) {
         this.windowX = windowX;
         this.windowY = windowY;
@@ -55,6 +63,10 @@ final public class State {
         this.windowHeight = windowHeight;
     }
 
+    public void openDialogDirectory(String directory) {
+        this.openDialogDirectory = directory;
+    }
+
     @Override
     public String toString() {
         return toStringHelper(this)
@@ -62,6 +74,7 @@ final public class State {
             .add("windowY", windowY)
             .add("windowWidth", windowWidth)
             .add("windowHeight", windowHeight)
+            .add("openDialogDirectory", openDialogDirectory)
             .toString();
     }
 }

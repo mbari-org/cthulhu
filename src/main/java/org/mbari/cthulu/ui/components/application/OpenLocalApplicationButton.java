@@ -37,10 +37,13 @@ final public class OpenLocalApplicationButton extends ApplicationButton {
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All Files", "*.*"));
         }
 
+        fileChooser.setInitialDirectory(new File(application().settings().state().openDialogDirectory()));
+
         List<File> selectedFiles = fileChooser.showOpenMultipleDialog(stage);
         if (selectedFiles != null) {
             selectedFiles.forEach(OpenLocalApplicationButton::openFile);
-            fileChooser.setInitialDirectory(selectedFiles.get(0).getParentFile());
+            File currentDirectory = selectedFiles.get(0).getParentFile();
+            application().settings().state().openDialogDirectory(currentDirectory.getAbsolutePath());
         }
     }
 

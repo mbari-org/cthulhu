@@ -69,6 +69,7 @@ public final class PlayerComponent {
 
         videoImageView = new ImageView();
         videoImageView.setPreserveRatio(true);
+        videoImageView.setCache(true);
 
         mediaPlayer = application().mediaPlayerFactory().mediaPlayers().newEmbeddedMediaPlayer();
         mediaPlayer.videoSurface().set(ImageViewVideoSurfaceFactory.getVideoSurface(videoImageView));

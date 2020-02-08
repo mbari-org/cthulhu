@@ -171,6 +171,7 @@ class PlayerComponentStage extends Stage {
      */
     void showDefaultView() {
         videoView.setVisible(false);
+        defaultView.setManaged(true);
         defaultView.setVisible(true);
     }
 
@@ -180,5 +181,6 @@ class PlayerComponentStage extends Stage {
     void showVideoView() {
         videoView.setVisible(true);
         defaultView.setVisible(false);
+        defaultView.setManaged(false);
     }
 }

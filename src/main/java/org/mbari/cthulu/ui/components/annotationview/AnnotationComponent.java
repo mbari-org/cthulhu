@@ -2,10 +2,12 @@ package org.mbari.cthulu.ui.components.annotationview;
 
 import com.google.common.base.Strings;
 import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
 import org.mbari.cthulu.model.Annotation;
 
+import static org.mbari.cthulu.app.CthulhuApplication.application;
 import static org.mbari.cthulu.ui.components.annotationview.ResourceFactory.createAnnotationRectangle;
 
 /**
@@ -19,8 +21,6 @@ class AnnotationComponent extends Group {
 
     private final Rectangle rectangle;
 
-    private final LinkComponent linkComponent;
-
     private final CaptionComponent captionComponent;
 
     /**
@@ -32,16 +32,13 @@ class AnnotationComponent extends Group {
         this.annotation = annotation;
 
         rectangle = createAnnotationRectangle(0, 0); // FIXME remove params
-        linkComponent = new LinkComponent();
         captionComponent = new CaptionComponent();
 
         setManaged(false);
 
         setCaption(annotation.caption().orElse(null));
 
-        repositionComponents();
-
-        getChildren().addAll(rectangle, linkComponent, captionComponent);
+        getChildren().addAll(rectangle, captionComponent);
     }
 
     /**
@@ -62,7 +59,6 @@ class AnnotationComponent extends Group {
          captionComponent.setCaption(caption);
          boolean showCaption = !Strings.isNullOrEmpty(caption);
          captionComponent.setVisible(showCaption);
-         linkComponent.setVisible(showCaption);
     }
 
     /**
@@ -88,14 +84,43 @@ class AnnotationComponent extends Group {
     }
 
     private void repositionComponents() {
-        // FIXME this hard-coded adjustment needs to be replaced, caption needs to make sure it fits in the parent
+        AnnotationImageView videoView = (AnnotationImageView) getParent();
+        if (videoView == null) {
+            return;
+        }
 
-        linkComponent.setStartX(rectangle.getWidth());
-        linkComponent.setStartY(0);
-        linkComponent.setEndX(linkComponent.getStartX() + 16);
-        linkComponent.setEndY(linkComponent.getStartY() - 16);
+        Bounds videoBounds = videoView.videoViewBounds();
 
-        captionComponent.setLayoutX(linkComponent.getEndX());
-        captionComponent.setLayoutY(linkComponent.getEndY() - 16);
+        int borderSize = application().settings().annotations().display().borderSize();
+        int captionBorderSize = 3;
+        int captionGap = 2;
+
+        captionComponent.applyCss();
+        captionComponent.layout();
+
+        Bounds captionBounds = captionComponent.getBoundsInParent();
+
+        double captionWidth = captionBounds.getWidth() + (2 * captionBorderSize);
+        double captionHeight = captionBounds.getHeight();
+
+        // Optimal position is to left-align
+        double x = -borderSize;
+        // Check if the caption fits
+        if (getLayoutX() + captionWidth > videoBounds.getWidth()) {
+            // Optimal position for caption does not fit, so right-align instead
+            x = rectangle.getWidth() - captionWidth;
+        }
+
+        // Optional position is to place above the annotation
+        double y = 0 - borderSize - captionHeight - captionBorderSize - captionGap;
+        // Check if the caption fits
+        if (getLayoutY() + y < 0) {
+            // Optimal position for caption does not fit, so place below the annotation instead
+            y = rectangle.getHeight() + borderSize + captionGap;
+        }
+
+        // Check if the optimal position for the label fits in the display area
+        captionComponent.setLayoutX(x);
+        captionComponent.setLayoutY(y);
     }
 }

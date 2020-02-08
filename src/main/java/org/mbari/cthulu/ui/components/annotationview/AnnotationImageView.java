@@ -226,8 +226,8 @@ public class AnnotationImageView extends ResizableImageView {
         log.debug("add(annotation={})", annotation);
         AnnotationComponent annotationComponent = new AnnotationComponent(annotation);
         BoundingBox absoluteBounds = annotationComponent.annotation().areaOfInterest().bounds();
-        annotationComponent.setBounds(absoluteToDisplayBounds(absoluteBounds));
         add(annotationComponent);
+        annotationComponent.setBounds(absoluteToDisplayBounds(absoluteBounds));
     }
 
     /**

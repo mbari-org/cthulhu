@@ -234,7 +234,7 @@ public class ResizableImageView extends Pane {
      *
      * @return video view bounds
      */
-    protected final Bounds videoViewBounds() {
+    public final Bounds videoViewBounds() {
         return imageView.getBoundsInParent();
     }
 

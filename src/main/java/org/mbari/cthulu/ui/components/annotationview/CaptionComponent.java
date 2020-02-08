@@ -5,6 +5,8 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -14,7 +16,7 @@ import static org.mbari.cthulu.app.CthulhuApplication.application;
 /**
  * A component used to render a caption.
  */
-final class CaptionComponent extends HBox {
+final class CaptionComponent extends StackPane {
 
     private static final String CONTAINER_STYLE_CLASS = "caption-component";
 

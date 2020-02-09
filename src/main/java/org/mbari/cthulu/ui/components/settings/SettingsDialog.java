@@ -28,7 +28,7 @@ final public class SettingsDialog extends Dialog<Boolean> {
 
     private static final String STYLESHEET_RESOURCE_NAME = "/org/mbari/cthulu/css/settings-dialog.css";
 
-    private static final int DIALOG_HEIGHT = 530;
+    private static final int DIALOG_HEIGHT = 550;
 
     /**
      * Component used to show the list of available settings pages, and to select which one to show.

@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 import org.mbari.cthulu.settings.Settings;
 import org.mbari.cthulu.ui.components.settings.SettingsPage;
 import org.mbari.cthulu.ui.components.settings.SettingsValidationException;
+import org.mbari.cthulu.ui.components.settings.controls.HelpTextLabel;
 import org.mbari.cthulu.ui.components.settings.controls.ItemLabel;
 import org.mbari.cthulu.ui.components.settings.controls.SectionDivider;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
     private final ColorPicker dragBorderColourPicker;
     private final TextField displayBorderSize;
     private final ColorPicker displayBorderColourPicker;
+    private final TextField timeWindowTextField;
     private final ColorPicker decayBorderColourPicker;
     private final TextField captionFontSizeTextField;
     private final ColorPicker captionTextColourPicker;
@@ -56,6 +58,10 @@ final public class AnnotationSettingsPane extends SettingsPage {
         displayBorderSize = new TextField();
         displayBorderSize.setPrefColumnCount(3);
         displayBorderColourPicker = new ColorPicker();
+
+        timeWindowTextField = new TextField();
+        timeWindowTextField.setPrefColumnCount(3);
+
         decayBorderColourPicker = new ColorPicker();
 
         captionFontSizeTextField = new TextField();
@@ -93,8 +99,11 @@ final public class AnnotationSettingsPane extends SettingsPage {
         displayPane.add(displayBorderSize);
         displayPane.add(new ItemLabel("Border Colour:"), "width 100::");
         displayPane.add(displayBorderColourPicker);
-        displayPane.add(new ItemLabel("Decay Colour:"), "width 100::, skip 2");
+        displayPane.add(new ItemLabel("Time Window:"), "width 100::");
+        displayPane.add(timeWindowTextField);
+        displayPane.add(new ItemLabel("Decay Colour:"), "width 100::");
         displayPane.add(decayBorderColourPicker);
+        displayPane.add(new HelpTextLabel("seconds"), "skip, span 3");
 
         contentPane.add(displayPane);
 
@@ -122,6 +131,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
         dragBorderColourPicker.setValue(Color.web(settings.annotations().creation().borderColour()));
         displayBorderSize.setText(Integer.toString(settings.annotations().display().borderSize()));
         displayBorderColourPicker.setValue(Color.web(settings.annotations().display().borderColour()));
+        timeWindowTextField.setText(Integer.toString(settings.annotations().display().timeWindow()));
         decayBorderColourPicker.setValue(Color.web(settings.annotations().display().decayBorderColour()));
         captionFontSizeTextField.setText(Double.toString(settings.annotations().captions().fontSize()));
         captionTextColourPicker.setValue(Color.web(settings.annotations().captions().textColour()));
@@ -138,6 +148,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
         settings.annotations().creation().borderColour(colorToWebString(dragBorderColourPicker.getValue()));
         settings.annotations().display().borderSize(parseInt(displayBorderSize.getText()));
         settings.annotations().display().borderColour(colorToWebString(displayBorderColourPicker.getValue()));
+        settings.annotations().display().timeWindow(parseInt(timeWindowTextField.getText()));
         settings.annotations().display().decayBorderColour(colorToWebString(decayBorderColourPicker.getValue()));
         settings.annotations().captions().fontSize(parseDouble(captionFontSizeTextField.getText()));
         settings.annotations().captions().textColour(colorToWebString(captionTextColourPicker.getValue()));

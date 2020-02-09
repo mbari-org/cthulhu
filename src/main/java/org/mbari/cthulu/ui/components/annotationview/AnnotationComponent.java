@@ -33,7 +33,7 @@ class AnnotationComponent extends Group {
     public AnnotationComponent(Annotation annotation) {
         this.annotation = annotation;
 
-        rectangle = createAnnotationRectangle(0, 0); // FIXME remove params
+        rectangle = createAnnotationRectangle();
         captionComponent = new CaptionComponent();
 
         setManaged(false);

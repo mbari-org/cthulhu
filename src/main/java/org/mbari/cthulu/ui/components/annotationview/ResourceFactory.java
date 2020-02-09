@@ -48,13 +48,13 @@ final class ResourceFactory {
      * <p>
      * Annotation rectangles are always created with an origin of (0,0) as they are always layed out within and
      * therefore relative to an {@link AnnotationComponent}.
+     * <p>
+     * Initial width and height will be zero, the caller is expected to fill these later.
      *
-     * @param width rectangle width
-     * @param height rectangle height
      * @return rectangle
      */
-    static Rectangle createAnnotationRectangle(double width, double height) {
-        Rectangle rectangle = new Rectangle(0, 0, width, height);
+    static Rectangle createAnnotationRectangle() {
+        Rectangle rectangle = new Rectangle(0, 0, 0, 0);
         rectangle.setFill(null);
         rectangle.setStroke(Color.web(application().settings().annotations().display().borderColour()));
         rectangle.setStrokeWidth(application().settings().annotations().display().borderSize());

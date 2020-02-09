@@ -10,6 +10,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.mbari.cthulu.ui.components.about.AboutDialog;
 import org.mbari.cthulu.ui.player.PlayerComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,7 @@ final public class MainStage extends Stage {
 
         // Map the standard keyboard shortcut for paste to open media based on the clipboard contents
         scene.getAccelerators().put(keyCombination("shortcut+v"), MainStage::openClipboard);
+        scene.getAccelerators().put(keyCombination("shift+f1"), this::showAboutDialog);
 
         // Window close button
         scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, MainStage::handleWindowCloseRequest);
@@ -127,5 +129,13 @@ final public class MainStage extends Stage {
     private static void handleWindowCloseRequest(WindowEvent windowEvent) {
         log.debug("handleWindowCloseRequest()");
         application().quit();
+    }
+
+    /**
+     * Show the application "About" dialog.
+     */
+    private void showAboutDialog() {
+        log.debug("showAboutDialog()");
+        new AboutDialog(this).showAndWait();
     }
 }

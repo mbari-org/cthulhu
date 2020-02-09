@@ -1,7 +1,9 @@
 package org.mbari.cthulu.ui.main;
 
+import com.google.common.base.Strings;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.TransferMode;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
+import static javafx.scene.input.KeyCombination.keyCombination;
 import static org.mbari.cthulu.app.CthulhuApplication.application;
 
 /**
@@ -42,6 +45,9 @@ final public class MainStage extends Stage {
         // Drag/drop from external sources
         scene.setOnDragOver(MainStage::handleDragOver);
         scene.setOnDragDropped(MainStage::handleDropped);
+
+        // Map the standard keyboard shortcut for paste to open media based on the clipboard contents
+        scene.getAccelerators().put(keyCombination("shortcut+v"), MainStage::openClipboard);
 
         // Window close button
         scene.getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, MainStage::handleWindowCloseRequest);
@@ -98,6 +104,19 @@ final public class MainStage extends Stage {
         log.debug("openFile(file={})", file);
         PlayerComponent playerComponent = application().open();
         playerComponent.mediaPlayer().media().play(file.getAbsolutePath());
+    }
+
+    /**
+     * Open the contents of the clipboard in a new media player comppnent.
+     */
+    private static void openClipboard() {
+        log.debug("openClipboard()");
+        String clipboard = Clipboard.getSystemClipboard().getString();
+        log.debug("clipboard={}", clipboard);
+        if (!Strings.isNullOrEmpty(clipboard)) {
+            PlayerComponent playerComponent = application().open();
+            playerComponent.mediaPlayer().media().play(clipboard);
+        }
     }
 
     /**

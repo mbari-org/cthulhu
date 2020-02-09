@@ -18,6 +18,8 @@ import static org.mbari.cthulu.app.CthulhuApplication.application;
  */
 final class CaptionComponent extends StackPane {
 
+    private static final String STYLESHEET_RESOURCE_NAME = "/org/mbari/cthulu/css/caption.css";
+
     private static final String CONTAINER_STYLE_CLASS = "caption-component";
 
     private static final String TEXT_STYLE_CLASS = "text";
@@ -28,6 +30,9 @@ final class CaptionComponent extends StackPane {
      * Create a caption component.
      */
     CaptionComponent() {
+        // Unlike with a Scene, the stylesheet resource must be converted to URL form otherwise it will not be loaded
+        getStylesheets().add(getClass().getResource(STYLESHEET_RESOURCE_NAME).toExternalForm());
+
         getStyleClass().add(CONTAINER_STYLE_CLASS);
 
         text = new Text();
@@ -36,6 +41,8 @@ final class CaptionComponent extends StackPane {
         applySettings();
 
         getChildren().add(text);
+
+        text.applyCss();
     }
 
     /**

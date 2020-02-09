@@ -6,9 +6,11 @@ import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
 import org.mbari.cthulu.model.Annotation;
+import org.mbari.cthulu.ui.components.layout.LayoutSupport;
 
 import static org.mbari.cthulu.app.CthulhuApplication.application;
 import static org.mbari.cthulu.ui.components.annotationview.ResourceFactory.createAnnotationRectangle;
+import static org.mbari.cthulu.ui.components.layout.LayoutSupport.layoutNode;
 
 /**
  * A visual component to render an annotation.
@@ -37,6 +39,9 @@ class AnnotationComponent extends Group {
         setManaged(false);
 
         setCaption(annotation.caption().orElse(null));
+
+        // Perform an immediate layout of the caption component so its proper size can be determined
+        layoutNode(captionComponent);
 
         getChildren().addAll(rectangle, captionComponent);
     }
@@ -108,7 +113,7 @@ class AnnotationComponent extends Group {
         // Check if the caption fits
         if (getLayoutX() + captionWidth > videoBounds.getWidth()) {
             // Optimal position for caption does not fit, so right-align instead
-            x = rectangle.getWidth() - captionWidth;
+            x = rectangle.getWidth() - captionWidth + (2 * borderSize);
         }
 
         // Optional position is to place above the annotation
@@ -116,7 +121,7 @@ class AnnotationComponent extends Group {
         // Check if the caption fits
         if (getLayoutY() + y < 0) {
             // Optimal position for caption does not fit, so place below the annotation instead
-            y = rectangle.getHeight() + borderSize + captionGap;
+            y = rectangle.getHeight() + (2 * borderSize) + captionGap - 1;
         }
 
         // Check if the optimal position for the label fits in the display area

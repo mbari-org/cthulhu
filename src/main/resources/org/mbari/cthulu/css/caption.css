@@ -1,0 +1,10 @@
+.caption-component {
+    -fx-border-radius: 6;
+    -fx-border-width: 3;
+    -fx-border-color: black;
+    -fx-padding: 0 4 0 4;
+}
+
+.caption-component .text {
+    -fx-font-smoothing-type: lcd;
+}

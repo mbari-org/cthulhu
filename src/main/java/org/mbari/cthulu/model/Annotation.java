@@ -13,7 +13,7 @@ public class Annotation {
     /**
      * Unique identifier for the annotation.
      */
-    private final String id = UUID.randomUUID().toString();
+    private final UUID id = UUID.randomUUID();
 
     /**
      * Area of interest, a bounding rectangle and timestamp.
@@ -50,7 +50,7 @@ public class Annotation {
      *
      * @return identifier
      */
-    public final String id() {
+    public final UUID id() {
         return id;
     }
 

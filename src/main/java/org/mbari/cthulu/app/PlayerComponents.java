@@ -24,6 +24,11 @@ final class PlayerComponents {
      */
     private final Map<UUID, PlayerComponent> playerComponents = new HashMap<>();
 
+    /**
+     * Currently active (i.e. focussed) player component.
+     */
+    private PlayerComponent active;
+
     PlayerComponents() {
     }
 
@@ -82,6 +87,11 @@ final class PlayerComponents {
         PlayerComponent playerComponent = playerComponents.get(uuid);
         log.debug("playerComponent={}", playerComponent);
         if (playerComponent != null) {
+            // Is the active player component being closed?
+            if (playerComponent.equals(active)) {
+                // No active component, a new active player component will be set on a subsequent stage focus event
+                active(null);
+            }
             playerComponent.close();
             playerComponents.remove(uuid);
             log.debug("closed uuid: {}", uuid);
@@ -139,10 +149,30 @@ final class PlayerComponents {
         return playerComponents.isEmpty();
     }
 
+    /**
+     * Track the currently active (i.e. focussed) media player component.
+     *
+     * @param playerComponent newly active component, may be <code>null</code>
+     */
+    void active(PlayerComponent playerComponent) {
+        log.debug("active(playerComponent={})", playerComponent);
+        this.active = playerComponent;
+    }
+
+    /**
+     * Get the active player component.
+     *
+     * @return the currently active player component
+     */
+    Optional<PlayerComponent> active() {
+        return Optional.ofNullable(active);
+    }
+
     @Override
     public String toString() {
         return toStringHelper(this)
             .add("playerComponents", playerComponents)
+            .add("active", active)
             .toString();
     }
 }

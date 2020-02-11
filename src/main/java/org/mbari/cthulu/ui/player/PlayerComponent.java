@@ -1,5 +1,7 @@
 package org.mbari.cthulu.ui.player;
 
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.stage.WindowEvent;
@@ -320,5 +322,17 @@ public final class PlayerComponent {
         return toStringHelper(this)
             .add("uuid", uuid)
             .toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+        PlayerComponent other = (PlayerComponent) obj;
+        return Objects.equal(uuid, other.uuid);
     }
 }

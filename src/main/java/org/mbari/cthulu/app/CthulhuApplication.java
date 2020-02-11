@@ -208,6 +208,16 @@ final public class CthulhuApplication {
     }
 
     /**
+     * Set the currently active (focussed) player component.
+     *
+     * @param playerComponent player component that is currently active
+     */
+    public void activePlayerComponent(PlayerComponent playerComponent) {
+        log.debug("activePlayerComponent(playerComponent={})", playerComponent);
+        playerComponents.active(playerComponent);
+    }
+
+    /**
      * Save the current settings to the configuration file.
      */
     public void saveSettings() {

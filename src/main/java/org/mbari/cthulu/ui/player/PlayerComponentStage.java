@@ -1,6 +1,7 @@
 package org.mbari.cthulu.ui.player;
 
 import io.reactivex.rxjava3.subjects.PublishSubject;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.DragEvent;
@@ -99,6 +100,9 @@ class PlayerComponentStage extends Stage {
         scene.setOnDragOver(this::handleDragOver);
         scene.setOnDragDropped(this::handleDropped);
 
+        // Track the focused state of the stage to maintain the currently active component
+        focusedProperty().addListener((observableValue, oldValue, newValue) -> focusChanged(newValue));
+
         show();
     }
 
@@ -149,6 +153,21 @@ class PlayerComponentStage extends Stage {
             dragEvent.setDropCompleted(false);
         }
         dragEvent.consume();
+    }
+
+    /**
+     * Handler invoked when the stage gains/loses the input focus.
+     *
+     * @param focussed <code>true</code> if this stage has the focus; <code>false</code> if it does not
+     */
+    private void focusChanged(boolean focussed) {
+        log.debug("focusOwnerChanged()");
+        // Only interested in focus-gained events: if focus lost to another player component that will be handled by its
+        // own focus event; if focus lost to some other application we still need to know which player component was the
+        // last focus owner
+        if (focussed) {
+            application().activePlayerComponent(playerComponent);
+        }
     }
 
     private void playPause() {

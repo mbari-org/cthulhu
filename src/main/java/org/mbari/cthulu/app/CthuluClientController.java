@@ -64,15 +64,7 @@ final class CthuluClientController implements ClientController {
     @Override
     public Optional<Video> requestVideoInfo() {
         log.debug("requestVideoInfo()");
-        // FIXME need to keep track of what's "current" somehow, currently this returns junk
-        Video result = null;
-        try {
-            result = new Video(UUID.randomUUID(), new URL("file:///dummy.mp4"));
-            return Optional.of(result); // it seems to not like empty optionsl
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
+        return application().playerComponents().active().map(playerComponent -> new Video(playerComponent.uuid(), url(playerComponent)));
     }
 
     @Override

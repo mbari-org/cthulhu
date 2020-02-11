@@ -1,7 +1,6 @@
 package org.mbari.cthulu.ui.player;
 
 import io.reactivex.rxjava3.subjects.PublishSubject;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.input.DragEvent;
@@ -14,10 +13,16 @@ import javafx.stage.Stage;
 import org.mbari.cthulu.ui.components.annotationview.AnnotationImageView;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.caprica.vlcj.media.MediaRef;
+import uk.co.caprica.vlcj.media.Meta;
+import uk.co.caprica.vlcj.media.MetaData;
+import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 
 import java.io.File;
 import java.util.stream.Stream;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static javafx.scene.input.KeyCombination.keyCombination;
 import static org.mbari.cthulu.app.CthulhuApplication.application;
 import static org.mbari.cthulu.ui.player.JogHandler.installJogHandler;
@@ -32,6 +37,8 @@ class PlayerComponentStage extends Stage {
     private static final String APPLICATION_ICON_RESOURCE_NAME = "/org/mbari/cthulu/icons/app/app-logo.png";
 
     private static final String APPLICATION_STYLESHEET_RESOURCE_NAME = "/org/mbari/cthulu/css/cthulu.css";
+
+    private static final String TITLE_FORMAT = "%s - %s";
 
     private static final int DEFAULT_WIDTH = 1200;
 
@@ -102,6 +109,24 @@ class PlayerComponentStage extends Stage {
 
         // Track the focused state of the stage to maintain the currently active component
         focusedProperty().addListener((observableValue, oldValue, newValue) -> focusChanged(newValue));
+
+        // Listen for media changed events to update the scene window title
+        playerComponent.mediaPlayer().events().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
+            @Override
+            public void mediaChanged(MediaPlayer mediaPlayer, MediaRef mediaRef) {
+                log.debug("mediaChanged(media={})", mediaPlayer.media().meta().get(Meta.TITLE));
+                if (mediaPlayer.media().isValid()) {
+                    MetaData metaData = mediaPlayer.media().meta().asMetaData();
+                    log.debug("metaData={}", metaData);
+                    // Even if the media has no specific meta data, the title will be populated from the filename/MRL
+                    String title = metaData.get(Meta.TITLE);
+                    log.debug("title={}", title);
+                    if (!isNullOrEmpty(title)) {
+                        setTitle(String.format(TITLE_FORMAT, title, application().applicationName()));
+                    }
+                }
+            }
+        });
 
         show();
     }

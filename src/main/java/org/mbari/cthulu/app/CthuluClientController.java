@@ -108,7 +108,7 @@ final class CthuluClientController implements ClientController {
     public Optional<Double> requestRate(UUID uuid) {
         log.debug("requestRate(uuid={})", uuid);
         return application().playerComponents().get(uuid)
-            .map(playerComponent -> (double) playerComponent.mediaPlayer().status().rate());
+            .map(playerComponent -> playerComponent.playing() ? (double) playerComponent.mediaPlayer().status().rate() : 0d);
     }
 
     @Override

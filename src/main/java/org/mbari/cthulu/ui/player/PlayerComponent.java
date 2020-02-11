@@ -58,6 +58,13 @@ public final class PlayerComponent {
     private volatile FrameRate frameRate;
 
     /**
+     * Flag if the media is playing or not.
+     * <p>
+     * This is set by a native media player event handler thread.
+     */
+    private volatile boolean playing;
+
+    /**
      * Report media duration, in milliseconds.
      * <p>
      * This is set by a native media player event handler thread.
@@ -142,14 +149,28 @@ public final class PlayerComponent {
             }
 
             @Override
+            public void playing(MediaPlayer mediaPlayer) {
+                log.debug("playing()");
+                setPlaying(true);
+            }
+
+            @Override
+            public void paused(MediaPlayer mediaPlayer) {
+                log.debug("paused()");
+                setPlaying(false);
+            }
+
+            @Override
             public void stopped(MediaPlayer mediaPlayer) {
                 log.debug("stopped()");
+                setPlaying(false);
                 Platform.runLater(() -> stage.showDefaultView());
             }
 
             @Override
             public void finished(MediaPlayer mediaPlayer) {
                 log.debug("finished()");
+                setPlaying(false);
                 // Can not seek when stopped, and in fact the media is "spent" so it makes sense to reset timers here
                 mediaPlayerEventSource.newTime(0);
                 mediaPlayerEventSource.newPosition(0);
@@ -158,6 +179,7 @@ public final class PlayerComponent {
             @Override
             public void error(MediaPlayer mediaPlayer) {
                 log.error("error()");
+                setPlaying(false);
                 Platform.runLater(() -> stage.showDefaultView());
             }
 
@@ -170,6 +192,11 @@ public final class PlayerComponent {
                 }
             }
         });
+    }
+
+    private void setPlaying(boolean playing) {
+        log.debug("setPlaying(playing={})", playing);
+        this.playing = playing;
     }
 
     private void setLength(long length) {
@@ -246,6 +273,15 @@ public final class PlayerComponent {
      */
     public MediaPlayerEventSource eventSource() {
         return mediaPlayerEventSource;
+    }
+
+    /**
+     * Report if the media is playing or not.
+     *
+     * @return <code>true</code> if the media is playing; <code>false</code> if it is not
+     */
+    public boolean playing() {
+        return playing;
     }
 
     /**

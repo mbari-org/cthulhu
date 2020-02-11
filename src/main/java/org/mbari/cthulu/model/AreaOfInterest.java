@@ -65,7 +65,10 @@ final public class AreaOfInterest {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof AreaOfInterest)) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
             return false;
         }
         AreaOfInterest other = (AreaOfInterest) obj;

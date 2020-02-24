@@ -9,8 +9,11 @@ final public class Network {
 
     private int controlPort;
 
+    private Localization localization;
+
     public Network() {
         this.controlPort = 5005;
+        this.localization = new Localization();
     }
 
     /**
@@ -20,6 +23,7 @@ final public class Network {
      */
     public Network(Network from) {
         this.controlPort = from.controlPort;
+        this.localization = new Localization(from.localization);
     }
 
     public int controlPort() {
@@ -30,10 +34,19 @@ final public class Network {
         this.controlPort = controlPort;
     }
 
+    public Localization localization() {
+        return localization;
+    }
+
+    public void setLocalization(Localization localization) {
+        this.localization = localization;
+    }
+
     @Override
     public String toString() {
         return toStringHelper(this)
             .add("controlPort", controlPort)
+            .add("localization", localization)
             .toString();
     }
 }

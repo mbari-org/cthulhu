@@ -8,7 +8,6 @@ import org.mbari.cthulu.app.config.KeyMap;
 import org.mbari.cthulu.app.config.MediaPlayerConfig;
 import org.mbari.cthulu.settings.Settings;
 import org.mbari.cthulu.ui.player.PlayerComponent;
-import org.mbari.vcr4j.sharktopoda.client.udp.IO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
@@ -48,7 +47,9 @@ final public class CthulhuApplication {
 
     private final NativeLog nativeLog;
 
-    private final IO controlIo;
+    private final org.mbari.vcr4j.sharktopoda.client.udp.IO controlIo;
+
+    private final org.mbari.vcr4j.sharktopoda.client.localization.IO localizationIo;
 
     private final PublishSubject<Settings> settingsChanged = PublishSubject.create();
 
@@ -74,6 +75,7 @@ final public class CthulhuApplication {
         this.nativeLog.addLogListener(new NativeLogHandler());
 
         this.controlIo = initControlPort();
+        this.localizationIo = initLocalizationPort();
     }
 
     /**
@@ -84,18 +86,46 @@ final public class CthulhuApplication {
      *
      * @return network control agent
      */
-    private IO initControlPort() {
+    private org.mbari.vcr4j.sharktopoda.client.udp.IO initControlPort() {
         log.debug("initControlPort()");
         try {
             int portNumber = settings.network().controlPort();
             log.debug("portNumber={}", portNumber);
             // FIXME with the current implementation of the external UDP agent library, any initialisation failure
             //       exception is swallowed by that library and it returns as normal, we do not see any exception here
-            IO io = new IO(new CthuluClientController(), portNumber);
-            log.info("application initialised, listening on UDP port {}", settings.network().controlPort());
+            org.mbari.vcr4j.sharktopoda.client.udp.IO io = new org.mbari.vcr4j.sharktopoda.client.udp.IO(new CthuluClientController(), portNumber);
+            log.info("application initialised, listening on UDP port {}", portNumber);
             return io;
         } catch (Exception e) {
             log.error("Failed to initialise network control port", e.getMessage());
+            // FIXME the idea is to add to a list of errors that can be fetched and reported by the first open stage
+            return null;
+        }
+    }
+
+    /**
+     * Initialise the network "localization" port.
+     *
+     * @return network localization agent
+     */
+    private org.mbari.vcr4j.sharktopoda.client.localization.IO initLocalizationPort() {
+        log.debug("initLocalizationPort()");
+        try {
+            int incomingPort = settings.network().localization().incomingPort();
+            int outgoingPort = settings.network().localization().outgoingPort();
+            String incomingTopic = settings.network().localization().incomingTopic();
+            String outgoingTopic = settings.network().localization().outgoingTopic();
+            log.debug("incomingPort={}", incomingPort);
+            log.debug("outgoingPort={}", outgoingPort);
+            log.debug("incomingTopic={}", incomingTopic);
+            log.debug("outgoingTopic={}", outgoingTopic);
+            // FIXME with the current implementation of the external UDP agent library, any initialisation failure
+            //       exception is swallowed by that library and it returns as normal, we do not see any exception here
+            org.mbari.vcr4j.sharktopoda.client.localization.IO io = new org.mbari.vcr4j.sharktopoda.client.localization.IO(incomingPort, outgoingPort, incomingTopic, outgoingTopic);
+            log.info("localization initialised, incoming {}:{}, outgoing {}:{}", incomingPort, incomingTopic, outgoingPort, outgoingTopic);
+            return io;
+        } catch (Exception e) {
+            log.error("Failed to initialise network localization", e.getMessage());
             // FIXME the idea is to add to a list of errors that can be fetched and reported by the first open stage
             return null;
         }

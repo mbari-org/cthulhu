@@ -18,8 +18,8 @@ final public class Localization {
     public Localization() {
         this.incomingPort = 5561;
         this.outgoingPort = 5562;
-        this.incomingTopic = "localization-in";
-        this.outgoingTopic = "localization-out";
+        this.incomingTopic = "localization";
+        this.outgoingTopic = "localization";
     }
 
     /**

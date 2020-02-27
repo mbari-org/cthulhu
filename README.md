@@ -1,6 +1,6 @@
-# MBARI Cthulu
+# MBARI Cthulhu
 
-Cthulu is a video playback and annotation application developed by the
+Cthulhu is a video playback and annotation application developed by the
 [Monteray Bay Aquarium Research Institute](https://mbari.org).
 
 
@@ -16,7 +16,7 @@ This application requires a [Java 11](https://adoptopenjdk.net/?variant=openjdk1
 environment. 
 
 
-## Building Cthulu
+## Building Cthulhu
 
 Getting the source:
 ```
@@ -33,7 +33,7 @@ $mvn clean install
 ```
 
 
-## Running Cthulu
+## Running Cthulhu
 
 Using Maven:
 ```
@@ -48,9 +48,9 @@ mitigated by specifying the following on the command-line when starting the appl
 -DVLCJ_INITX=no
 ```
 
-## Using Cthulu
+## Using Cthulhu
 
-Some minimal instructions for using Cthulu...
+Some minimal instructions for using Cthulhu...
 
 The application can function as a regular media player - you can open local files, paste clipboard contents to open 
 files (either a local filename or a URL), or drag a local file over the application to play it.

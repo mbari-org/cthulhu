@@ -267,6 +267,10 @@ final public class CthulhuApplication {
     private void close() {
         log.debug("close()");
 
+        if (localizationIo != null) {
+            localizationIo.close();
+        }
+
         if (controlIo != null) {
             controlIo.close();
         }

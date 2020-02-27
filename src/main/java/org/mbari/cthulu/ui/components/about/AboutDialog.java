@@ -8,6 +8,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.Window;
 import org.tbee.javafx.scene.layout.MigPane;
 
 import static org.mbari.cthulu.app.CthulhuApplication.application;
@@ -30,7 +31,7 @@ public class AboutDialog extends Dialog<Integer> {
      *
      * @param stage stage that is the parent for the dialog
      */
-    public AboutDialog(Stage stage) {
+    public AboutDialog(Window stage) {
         super();
 
         initOwner(stage);

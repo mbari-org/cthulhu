@@ -29,7 +29,6 @@ final class MainMenu extends MenuBar {
     private static final Logger log = LoggerFactory.getLogger(MainMenu.class);
 
     private final PlayerComponent playerComponent;
-    private final Stage stage;
 
     private final Menu mediaMenu;
     private final MenuItem mediaOpenFileMenuItem;
@@ -61,9 +60,8 @@ final class MainMenu extends MenuBar {
 
     private FileChooser fileChooser;
 
-    MainMenu(PlayerComponent playerComponent, Stage stage) {
+    MainMenu(PlayerComponent playerComponent) {
         this.playerComponent = playerComponent;
-        this.stage = stage;
 
         mediaMenu = new Menu("_Media");
         mediaMenu.setMnemonicParsing(true);
@@ -174,7 +172,7 @@ final class MainMenu extends MenuBar {
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Video Files", videoFileExtensions()));
             fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All Files", "*.*"));
         }
-        File selectedFile = fileChooser.showOpenDialog(stage);
+        File selectedFile = fileChooser.showOpenDialog(getScene().getWindow());
         if (selectedFile != null) {
             fileChooser.setInitialDirectory(selectedFile.getParentFile());
             // FIXME this may need to go via an application() event in case we have some behaviours to init/reset when playing media
@@ -238,7 +236,7 @@ final class MainMenu extends MenuBar {
     private void showOptionsDialog(ActionEvent actionEvent) {
         log.debug("showOptionsDialog()");
         if (settingsDialog == null) {
-            settingsDialog = new SettingsDialog(stage);
+            settingsDialog = new SettingsDialog(getScene().getWindow());
         }
         Settings newSettings = new Settings(application().settings());
         settingsDialog.setSettings(newSettings);
@@ -250,7 +248,7 @@ final class MainMenu extends MenuBar {
     private void showAboutDialog(ActionEvent actionEvent) {
         log.debug("showAboutDialog()");
         if (aboutDialog == null) {
-            aboutDialog = new AboutDialog(stage);
+            aboutDialog = new AboutDialog(getScene().getWindow());
         }
         aboutDialog.showAndWait();
     }

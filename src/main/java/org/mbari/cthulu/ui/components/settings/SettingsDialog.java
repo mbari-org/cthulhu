@@ -9,6 +9,7 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import org.mbari.cthulu.settings.Settings;
 import org.mbari.cthulu.ui.components.settings.pages.AnnotationSettingsPane;
 import org.mbari.cthulu.ui.components.settings.pages.InterfaceSettingsPane;
@@ -45,7 +46,7 @@ final public class SettingsDialog extends Dialog<Boolean> {
      *
      * @param stage stage that is the parent for the dialog
      */
-    public SettingsDialog(Stage stage) {
+    public SettingsDialog(Window stage) {
         super();
 
         initOwner(stage);

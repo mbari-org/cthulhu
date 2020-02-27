@@ -69,7 +69,7 @@ class PlayerComponentStage extends Stage {
 
         defaultView = new PlayerDefaultView();
         videoView.setVisible(false);
-        mainMenu = new MainMenu(playerComponent, this);
+        mainMenu = new MainMenu(playerComponent);
 
         StackPane stackPane = new StackPane();
         stackPane.getChildren().addAll(defaultView, annotationImageView);

@@ -6,7 +6,6 @@ import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
 import org.mbari.cthulu.model.Annotation;
-import org.mbari.cthulu.ui.components.layout.LayoutSupport;
 
 import static org.mbari.cthulu.app.CthulhuApplication.application;
 import static org.mbari.cthulu.ui.components.annotationview.ResourceFactory.createAnnotationRectangle;

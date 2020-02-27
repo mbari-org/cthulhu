@@ -8,6 +8,7 @@ import org.mbari.cthulu.app.config.KeyMap;
 import org.mbari.cthulu.app.config.MediaPlayerConfig;
 import org.mbari.cthulu.settings.Settings;
 import org.mbari.cthulu.ui.player.PlayerComponent;
+import org.mbari.vcr4j.sharktopoda.client.localization.LocalizationController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
@@ -201,6 +202,15 @@ final public class CthulhuApplication {
      */
     public Observable<Settings> settingsChanged() {
         return settingsChanged;
+    }
+
+    /**
+     * Get the "localization" (i.e. bounding box) component.
+     *
+     * @return localization component
+     */
+    public LocalizationController localization() {
+        return localizationIo.getController();
     }
 
     /**

@@ -16,9 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 
+import static java.util.stream.Collectors.toList;
 import static org.mbari.cthulu.app.CthulhuApplication.application;
 import static org.mbari.cthulu.ui.components.annotationview.ResourceFactory.createCursorRectangle;
 import static org.mbari.cthulu.ui.components.annotationview.ResourceFactory.createDragRectangle;
@@ -52,7 +56,12 @@ public class AnnotationImageView extends ResizableImageView {
     /**
      * Map of all currently display annotations, keyed by their unique identifier.
      */
-    private Map<String, Annotation> annotationsById = new HashMap<>();
+    private Map<UUID, AnnotationComponent> annotationsById = new HashMap<>();
+
+    /**
+     * Elapsed time in the video (in milliseconds) when the mouse button was pressed to start creating an annotation.
+     */
+    private long mousePressedTime;
 
     /**
      * Anchor coordinate for mouse drags.
@@ -106,6 +115,8 @@ public class AnnotationImageView extends ResizableImageView {
     private void mousePressed(MouseEvent event) {
         requestFocus();
 
+        mousePressedTime = playerComponent.mediaPlayer().status().time();
+
         double x = anchorX = event.getX();
         double y = anchorY = event.getY();
 
@@ -153,13 +164,17 @@ public class AnnotationImageView extends ResizableImageView {
         dragRectangle.setVisible(false);
         if (dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
             newAnnotation();
-            anchorX = anchorY = -1d;
         }
+
+        mousePressedTime = -1L;
+        anchorX = anchorY = -1d;
     }
 
     private void keyPressed(KeyEvent event) {
         if (dragRectangle.isVisible() && CANCEL_DRAG_KEY_CODE == event.getCode()) {
             dragRectangle.setVisible(false);
+
+            mousePressedTime = -1L;
             anchorX = anchorY = -1d;
         }
     }
@@ -180,7 +195,7 @@ public class AnnotationImageView extends ResizableImageView {
         BoundingBox absoluteBounds = displayToAbsoluteBounds(dragRectangle);
         log.debug("absoluteBounds={}", absoluteBounds);
 
-        Annotation annotation = new Annotation(new AreaOfInterest(playerComponent.mediaPlayer().status().time(), absoluteBounds));
+        Annotation annotation = new Annotation(new AreaOfInterest(mousePressedTime, absoluteBounds));
         log.debug("annotation={}", annotation);
 
         if (onNewAnnotation != null) {
@@ -228,6 +243,33 @@ public class AnnotationImageView extends ResizableImageView {
         BoundingBox absoluteBounds = annotationComponent.annotation().areaOfInterest().bounds();
         add(annotationComponent);
         annotationComponent.setBounds(absoluteToDisplayBounds(absoluteBounds));
+        annotationsById.put(annotation.id(), annotationComponent);
+    }
+
+    /**
+     * Add one or more annotations to the view.
+     *
+     * @param annotations annotations to add
+     */
+    public void add(List<Annotation> annotations) {
+        log.debug("add(annotations={})", annotations);
+        annotations.forEach(this::add);
+    }
+
+    /**
+     * Remove one or more annotations, given their unique identifier.
+     *
+     * @param idsToRemove collection of unique identifiers of the annotations to remove
+     */
+    public void remove(List<UUID> idsToRemove) {
+        log.debug("remove(idsToRemove={})", idsToRemove);
+        List<AnnotationComponent> componentsToRemove = idsToRemove.stream()
+            .map(id -> annotationsById.get(id))
+            .filter(Objects::nonNull)
+            .collect(toList());
+        log.debug("componentsToRemove={}", componentsToRemove);
+        getChildren().removeAll(componentsToRemove);
+        idsToRemove.forEach(annotationsById::remove);
     }
 
     /**
@@ -235,7 +277,7 @@ public class AnnotationImageView extends ResizableImageView {
      */
     public void clear() {
         log.debug("clear()");
-        getChildren().removeIf(node -> node instanceof AnnotationComponent);
+        getChildren().removeAll(annotationsById.values());
         annotationsById = new HashMap<>();
     }
 

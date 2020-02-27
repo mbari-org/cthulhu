@@ -13,7 +13,7 @@ public class Annotation {
     /**
      * Unique identifier for the annotation.
      */
-    private final UUID id = UUID.randomUUID();
+    private final UUID id;
 
     /**
      * Area of interest, a bounding rectangle and timestamp.
@@ -26,14 +26,26 @@ public class Annotation {
     private String caption;
 
     /**
+     * Create a video annotation, with a specific unique identifier and a caption.
+     *
+     * @param id unique identifier
+     * @param areaOfInterest area of interest
+     * @param caption caption text
+     */
+    public Annotation(UUID id, AreaOfInterest areaOfInterest, String caption) {
+        this.id = id;
+        this.areaOfInterest = areaOfInterest;
+        this.caption = caption;
+    }
+
+    /**
      * Create a video annotation, with a caption.
      *
      * @param areaOfInterest area of interest
      * @param caption caption text
      */
     public Annotation(AreaOfInterest areaOfInterest, String caption) {
-        this.areaOfInterest = areaOfInterest;
-        this.caption = caption;
+        this(UUID.randomUUID(), areaOfInterest, caption);
     }
 
     /**

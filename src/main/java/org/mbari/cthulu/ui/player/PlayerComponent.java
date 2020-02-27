@@ -1,6 +1,5 @@
 package org.mbari.cthulu.ui.player;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
@@ -85,7 +84,7 @@ public final class PlayerComponent {
 
         annotationImageView = new AnnotationImageView(this);
 
-        annotationsController = new AnnotationsController(annotationImageView);
+        annotationsController = new AnnotationsController(this, annotationImageView);
 
         mediaPlayerTimer = new MediaPlayerTimer(mediaPlayer, mediaPlayerEventSource::newTime);
 

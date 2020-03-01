@@ -49,7 +49,7 @@ public final class PlayerComponent {
 
     private final AnnotationController annotationController;
 
-    private final MediaPlayerTimer mediaPlayerTimer;
+    private MediaPlayerTimer mediaPlayerTimer;
 
     private final MediaPlayerControls mediaPlayerControls;
 
@@ -289,6 +289,9 @@ public final class PlayerComponent {
                 (int) Math.round(stage.getWidth()),
                 (int) Math.round(stage.getHeight())
             );
+
+            mediaPlayerTimer.cancel();
+            mediaPlayerTimer = null;
 
             mediaPlayer.controls().stop();
             mediaPlayer.release();

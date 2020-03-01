@@ -32,7 +32,7 @@ final class MediaPlayerTimer {
     /**
      * Timer implementation.
      */
-    private final Timer timer = new Timer(true);
+    private Timer timer = new Timer(true);
 
     /**
      * Previous whole seconds value.
@@ -63,5 +63,13 @@ final class MediaPlayerTimer {
                 }
             }
         }, 0, PERIOD);
+    }
+
+    /**
+     * Cancel the timer.
+     */
+    void cancel() {
+        timer.cancel();
+        timer = null;
     }
 }

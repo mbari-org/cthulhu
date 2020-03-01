@@ -16,6 +16,8 @@ import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 import java.util.UUID;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static org.mbari.cthulu.app.CthulhuApplication.application;
@@ -36,6 +38,8 @@ public final class PlayerComponent {
      * Component that manages the one source of truth for current time and position.
      */
     private final MediaPlayerEventSource mediaPlayerEventSource = new MediaPlayerEventSource();
+
+    private final ReadWriteLock closeLock = new ReentrantReadWriteLock();
 
     private final ImageView videoImageView;
 
@@ -122,7 +126,7 @@ public final class PlayerComponent {
             public void elementaryStreamAdded(MediaPlayer mediaPlayer, TrackType type, int id) {
                 log.debug("elementaryStreamAdded(type={}, id={})", type, id);
                 if (type == TrackType.VIDEO && id != -1) {
-                    Platform.runLater(() -> stage.showVideoView());
+                    Platform.runLater(PlayerComponent.this::showVideoView);
                 }
             }
 
@@ -165,7 +169,7 @@ public final class PlayerComponent {
             public void stopped(MediaPlayer mediaPlayer) {
                 log.debug("stopped()");
                 setPlaying(false);
-                Platform.runLater(() -> stage.showDefaultView());
+                Platform.runLater(PlayerComponent.this::showDefaultView);
             }
 
             @Override
@@ -181,7 +185,7 @@ public final class PlayerComponent {
             public void error(MediaPlayer mediaPlayer) {
                 log.error("error()");
                 setPlaying(false);
-                Platform.runLater(() -> stage.showDefaultView());
+                Platform.runLater(PlayerComponent.this::showDefaultView);
             }
 
             @Override
@@ -208,6 +212,28 @@ public final class PlayerComponent {
     private void setFrameRate(FrameRate frameRate) {
         log.debug("setFrameRate(frameRate={})", frameRate);
         this.frameRate = frameRate;
+    }
+
+    private void showDefaultView() {
+        closeLock.readLock().lock();
+        try {
+            if (stage != null) {
+                stage.showDefaultView();
+            }
+        } finally {
+            closeLock.readLock().unlock();
+        }
+    }
+
+    private void showVideoView() {
+        closeLock.readLock().lock();
+        try {
+            if (stage != null) {
+                stage.showVideoView();
+            }
+        } finally {
+            closeLock.readLock().unlock();
+        }
     }
 
     private void closeWindow(WindowEvent windowEvent) {
@@ -256,15 +282,22 @@ public final class PlayerComponent {
     public void close() {
         log.debug("close()");
 
-        application().settings().state().window(
-            (int) Math.round(stage.getWidth()),
-            (int) Math.round(stage.getHeight())
-        );
+        closeLock.writeLock().lock();
 
-        mediaPlayer.controls().stop();
-        mediaPlayer.release();
+        try {
+            application().settings().state().window(
+                (int) Math.round(stage.getWidth()),
+                (int) Math.round(stage.getHeight())
+            );
 
-        stage.close();
+            mediaPlayer.controls().stop();
+            mediaPlayer.release();
+
+            stage.close();
+            stage = null;
+        } finally {
+            closeLock.writeLock().unlock();
+        }
     }
 
     /**

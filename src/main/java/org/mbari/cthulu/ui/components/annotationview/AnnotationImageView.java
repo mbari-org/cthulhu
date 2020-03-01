@@ -8,7 +8,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.mbari.cthulu.model.Annotation;
-import org.mbari.cthulu.model.AreaOfInterest;
 import org.mbari.cthulu.settings.Settings;
 import org.mbari.cthulu.ui.components.imageview.ResizableImageView;
 import org.mbari.cthulu.ui.player.PlayerComponent;
@@ -54,7 +53,9 @@ public class AnnotationImageView extends ResizableImageView {
     private Consumer<Annotation> onNewAnnotation;
 
     /**
-     * Map of all currently display annotations, keyed by their unique identifier.
+     * Map of all currently active annotation components, keyed by their unique identifier.
+     * <p>
+     * This map contains only the currently active annotation components, i.e. those components that are visible in the view at the present time.
      */
     private Map<UUID, AnnotationComponent> annotationsById = new HashMap<>();
 
@@ -195,7 +196,8 @@ public class AnnotationImageView extends ResizableImageView {
         BoundingBox absoluteBounds = displayToAbsoluteBounds(dragRectangle);
         log.debug("absoluteBounds={}", absoluteBounds);
 
-        Annotation annotation = new Annotation(new AreaOfInterest(mousePressedTime, absoluteBounds));
+        int defaultDuration = application().settings().annotations().display().timeWindow() * 1000;
+        Annotation annotation = new Annotation(mousePressedTime, mousePressedTime + defaultDuration, absoluteBounds);
         log.debug("annotation={}", annotation);
 
         if (onNewAnnotation != null) {
@@ -240,7 +242,7 @@ public class AnnotationImageView extends ResizableImageView {
     public void add(Annotation annotation) {
         log.debug("add(annotation={})", annotation);
         AnnotationComponent annotationComponent = new AnnotationComponent(annotation);
-        BoundingBox absoluteBounds = annotationComponent.annotation().areaOfInterest().bounds();
+        BoundingBox absoluteBounds = annotationComponent.annotation().bounds();
         add(annotationComponent);
         annotationComponent.setBounds(absoluteToDisplayBounds(absoluteBounds));
         annotationsById.put(annotation.id(), annotationComponent);
@@ -288,7 +290,7 @@ public class AnnotationImageView extends ResizableImageView {
             .filtered(child -> child instanceof AnnotationComponent)
             .forEach(child -> {
                 AnnotationComponent annotationComponent = (AnnotationComponent) child;
-                BoundingBox absoluteBounds = annotationComponent.annotation().areaOfInterest().bounds();
+                BoundingBox absoluteBounds = annotationComponent.annotation().bounds();
                 annotationComponent.setBounds(absoluteToDisplayBounds(absoluteBounds));
             });
     }

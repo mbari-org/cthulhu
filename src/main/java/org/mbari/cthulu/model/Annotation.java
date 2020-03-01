@@ -1,6 +1,7 @@
 package org.mbari.cthulu.model;
 
 import com.google.common.base.MoreObjects;
+import javafx.geometry.BoundingBox;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -16,9 +17,19 @@ public class Annotation {
     private final UUID id;
 
     /**
+     *
+     */
+    private final long startTime;
+
+    /**
+     *
+     */
+    private final long endTime;
+
+    /**
      * Area of interest, a bounding rectangle and timestamp.
      */
-    private final AreaOfInterest areaOfInterest;
+    private final BoundingBox bounds;
 
     /**
      * Optional caption text.
@@ -29,32 +40,28 @@ public class Annotation {
      * Create a video annotation, with a specific unique identifier and a caption.
      *
      * @param id unique identifier
-     * @param areaOfInterest area of interest
+     * @param startTime
+     * @param endTime
+     * @param bounds area of interest
      * @param caption caption text
      */
-    public Annotation(UUID id, AreaOfInterest areaOfInterest, String caption) {
+    public Annotation(UUID id, long startTime, long endTime, BoundingBox bounds, String caption) {
         this.id = id;
-        this.areaOfInterest = areaOfInterest;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.bounds = bounds;
         this.caption = caption;
-    }
-
-    /**
-     * Create a video annotation, with a caption.
-     *
-     * @param areaOfInterest area of interest
-     * @param caption caption text
-     */
-    public Annotation(AreaOfInterest areaOfInterest, String caption) {
-        this(UUID.randomUUID(), areaOfInterest, caption);
     }
 
     /**
      * Create a video annotation, without a caption.
      *
-     * @param areaOfInterest area of interest
+     * @param startTime
+     * @param endTime
+     * @param bounds area of interest
      */
-    public Annotation(AreaOfInterest areaOfInterest) {
-        this(areaOfInterest, null);
+    public Annotation(long startTime, long endTime, BoundingBox bounds) {
+        this(UUID.randomUUID(), startTime, endTime, bounds, null);
     }
 
     /**
@@ -67,12 +74,39 @@ public class Annotation {
     }
 
     /**
+     *
+     *
+     * @return
+     */
+    public final long startTime() {
+        return startTime;
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    public final long endTime() {
+        return endTime;
+    }
+
+    /**
+     *
+     *
+     * @return
+     */
+    public final long duration() {
+        return endTime - startTime;
+    }
+
+    /**
      * Get the area of interest for this video annotation.
      *
      * @return area of interest
      */
-    public final AreaOfInterest areaOfInterest() {
-        return areaOfInterest;
+    public final BoundingBox bounds() {
+        return bounds;
     }
 
     /**
@@ -97,7 +131,9 @@ public class Annotation {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("id", id)
-            .add("areaOfInterest", areaOfInterest)
+            .add("startTime", startTime)
+            .add("endTime", endTime)
+            .add("bounds", bounds)
             .add("caption", caption)
             .toString();
     }

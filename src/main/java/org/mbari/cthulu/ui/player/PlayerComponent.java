@@ -4,7 +4,7 @@ import com.google.common.base.Objects;
 import javafx.application.Platform;
 import javafx.scene.image.ImageView;
 import javafx.stage.WindowEvent;
-import org.mbari.cthulu.annotations.AnnotationsController;
+import org.mbari.cthulu.annotations.AnnotationController;
 import org.mbari.cthulu.ui.components.annotationview.AnnotationImageView;
 import org.mbari.cthulu.ui.videosurface.ImageViewVideoSurfaceFactory;
 import org.slf4j.Logger;
@@ -43,13 +43,13 @@ public final class PlayerComponent {
 
     private final AnnotationImageView annotationImageView;
 
-    private final AnnotationsController annotationsController;
+    private final AnnotationController annotationController;
 
     private final MediaPlayerTimer mediaPlayerTimer;
 
     private final MediaPlayerControls mediaPlayerControls;
 
-    private final PlayerComponentStage stage;
+    private PlayerComponentStage stage;
 
     /**
      * Reported video frame rate.
@@ -84,7 +84,7 @@ public final class PlayerComponent {
 
         annotationImageView = new AnnotationImageView(this);
 
-        annotationsController = new AnnotationsController(this, annotationImageView);
+        annotationController = new AnnotationController(this, annotationImageView);
 
         mediaPlayerTimer = new MediaPlayerTimer(mediaPlayer, mediaPlayerEventSource::newTime);
 
@@ -106,7 +106,7 @@ public final class PlayerComponent {
     }
 
     private void registerAnnotationEventHandlers() {
-        annotationImageView.setOnNewAnnotation(annotationsController::annotationCreated);
+        annotationImageView.setOnNewAnnotation(annotationController::annotationCreated);
     }
 
     private void registerMediaPlayerEventHandlers() {

@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * There are similar concerns with volume changes.
  */
-final class MediaPlayerEventSource {
+final public class MediaPlayerEventSource {
 
     private static final Logger log = LoggerFactory.getLogger(MediaPlayerEventSource.class);
 
@@ -96,7 +96,7 @@ final class MediaPlayerEventSource {
      *
      * @return time observable
      */
-    Observable<Long> time() {
+    public Observable<Long> time() {
         return time;
     }
 

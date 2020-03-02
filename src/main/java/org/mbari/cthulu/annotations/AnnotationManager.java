@@ -3,17 +3,23 @@ package org.mbari.cthulu.annotations;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
+import javafx.geometry.BoundingBox;
 import org.mbari.cthulu.model.Annotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.BiFunction;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 
 /**
@@ -53,7 +59,12 @@ final class AnnotationManager {
      * <p>
      * The map values are lists of annotations, since although unlikely it is possible that two distinct annotations have the exact same time range.
      */
-    private RangeMap<Long, List<Annotation>> annotationsByElapsedTime = TreeRangeMap.create();
+    private final RangeMap<Long, List<Annotation>> annotationsByElapsedTime = TreeRangeMap.create();
+
+    /**
+     * Identifiers for the annotations that are active, based on the current elapsed time.
+     */
+    private final Set<UUID> activeIds = new HashSet<>();
 
     /**
      * Add a collection of annotations.
@@ -75,15 +86,40 @@ final class AnnotationManager {
         annotations.forEach(this::remove);
     }
 
-    /**
-     * Get the currently active annotations.
-     *
-     * @param elapsedTime timestamp
-     * @return annotations that are active at the given timestamp, may be empty but never <code>null</code>
-     */
+    Optional<AnnotationChanges> setElapsedTime(long elapsedTime) {
+        log.trace("setElapsedTime(elapsedTime={})", elapsedTime);
+
+        // Start with all annotations that are active for the given time
+        List<Annotation> activeAnnotations = current(elapsedTime);
+
+        // Determine which annotations are newly active, filtering out those that are already tracked
+        List<Annotation> newActiveAnnotations = activeAnnotations.stream()
+            .filter(annotation -> !activeIds.contains(annotation.id()))
+            .collect(toList());
+
+        // From the newly active annotations, extract the unique set of ids and add them to the collection of those that are active
+        Set<UUID> newActiveIds = newActiveAnnotations.stream()
+            .map(Annotation::id)
+            .collect(toSet());
+        activeIds.addAll(newActiveIds);
+
+        // To determine which annotations are no longer active, start with the set of all ids that are currently active (not just the newly added ones)
+        Set<UUID> allActiveIds = activeAnnotations.stream()
+            .map(Annotation::id)
+            .collect(toSet());
+
+        // From the collection of those annotations that are currently active, remove any where their id is not in the set of all currently active ids
+        List<UUID> noLongerActiveIds = activeIds.stream()
+            .filter(id -> !allActiveIds.contains(id))
+            .collect(toList());
+        activeIds.removeAll(noLongerActiveIds);
+
+        return Optional.of(new AnnotationChanges(newActiveAnnotations, noLongerActiveIds));
+    }
+
     List<Annotation> current(long elapsedTime) {
-        List<Annotation> result =  annotationsByElapsedTime.get(elapsedTime);
-        return result != null ? result : emptyList();
+        List<Annotation> result = annotationsByElapsedTime.get(elapsedTime);
+        return result != null ? result: emptyList();
     }
 
     /**

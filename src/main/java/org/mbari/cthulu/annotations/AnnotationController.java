@@ -1,5 +1,6 @@
 package org.mbari.cthulu.annotations;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener.Change;
 import javafx.geometry.BoundingBox;
 import org.mbari.cthulu.model.Annotation;
@@ -10,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +50,9 @@ final public class AnnotationController {
             .getLocalizations()
             .filtered(localization -> playerComponent.uuid().equals(localization.getVideoReferenceUuid()))
             .addListener(this::handleLocalizationChanged);
+
+        // FIXME this event source delivers per second, we want as fine grained as possible here
+        playerComponent.eventSource().time().subscribe(this::handleTimeChanged);
     }
 
     /**
@@ -68,6 +71,21 @@ final public class AnnotationController {
         annotationManager.add(singletonList(annotation));
         // Send the new annotation to the network sink
         application().localization().addLocalization(annotationToLocalization(annotation));
+    }
+
+    private void handleTimeChanged(long newTime) {
+        log.trace("handleTimeChanged(newTime={})", newTime);
+
+        annotationManager.setElapsedTime(newTime).ifPresent(changes -> {
+            Platform.runLater(() -> {
+                if (!changes.removes().isEmpty()) {
+                    annotationView.remove(changes.removes());
+                }
+                if (!changes.adds().isEmpty()) {
+                    annotationView.add(changes.adds());
+                }
+            });
+        });
     }
 
     private void handleLocalizationChanged(Change<? extends Localization> change) {

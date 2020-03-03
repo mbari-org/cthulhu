@@ -172,7 +172,7 @@ final class AnnotationManager {
     private Range range(Annotation annotation) {
         int timeWindow = application().settings().annotations().display().timeWindow() * 1000;
         return Range.closed(annotation.startTime() - timeWindow, annotation.endTime() + timeWindow);
-    },
+    }
 
     @Override
     public String toString() {

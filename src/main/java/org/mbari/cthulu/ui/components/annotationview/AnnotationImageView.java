@@ -240,6 +240,10 @@ public class AnnotationImageView extends ResizableImageView {
      */
     public void add(Annotation annotation) {
         log.debug("add(annotation={})", annotation);
+        if (annotationsById.containsKey(annotation.id())) {
+            log.debug("Not adding already added annotation with same UUID");
+            return;
+        }
         AnnotationComponent annotationComponent = new AnnotationComponent(annotation);
         BoundingBox absoluteBounds = annotationComponent.annotation().bounds();
         add(annotationComponent);

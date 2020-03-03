@@ -91,24 +91,22 @@ final public class AnnotationController {
     private void handleLocalizationChanged(Change<? extends Localization> change) {
         log.debug("handleLocalizationChanged(change={})", change);
 
-        if (change.wasRemoved()) {
-            List<? extends Localization> removed = change.getRemoved();
-            log.debug("removed={}", removed);
+        while (change.next()) {
+            if (change.wasRemoved()) {
+                List<? extends Localization> removed = change.getRemoved();
+                log.debug("removed={}", removed);
 
-            List<Annotation> annotations = removed.stream().map(this::localizationToAnnotation).collect(toList());
-            removeAnnotations(annotations);
-        } else {
-            log.debug("no localization removes");
-        }
+                List<Annotation> annotations = removed.stream().map(this::localizationToAnnotation).collect(toList());
+                removeAnnotations(annotations);
+            }
 
-        if (change.wasAdded()) {
-            List<? extends Localization> added = change.getAddedSubList();
-            log.debug("added={}", added);
+            if (change.wasAdded()) {
+                List<? extends Localization> added = change.getAddedSubList();
+                log.debug("added={}", added);
 
-            List<Annotation> annotations = added.stream().map(this::localizationToAnnotation).collect(toList());
-            addAnnotations(annotations);
-        } else {
-            log.debug("no localization adds");
+                List<Annotation> annotations = added.stream().map(this::localizationToAnnotation).collect(toList());
+                addAnnotations(annotations);
+            }
         }
     }
 

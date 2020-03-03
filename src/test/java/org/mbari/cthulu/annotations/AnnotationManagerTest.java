@@ -1,6 +1,7 @@
 package org.mbari.cthulu.annotations;
 
 import javafx.geometry.BoundingBox;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mbari.cthulu.model.Annotation;
@@ -10,6 +11,7 @@ import java.util.UUID;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mbari.cthulu.app.CthulhuApplication.application;
 
 /**
  * Tests for the {@link AnnotationManager component.}
@@ -17,6 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class AnnotationManagerTest {
 
     private AnnotationManager annotationManager;
+
+    @BeforeAll
+    public static void prepare() {
+        application().settings().annotations().display().timeWindow(0);
+    }
 
     @BeforeEach
     public void setup() {

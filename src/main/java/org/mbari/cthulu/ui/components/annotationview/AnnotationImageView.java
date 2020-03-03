@@ -196,8 +196,7 @@ public class AnnotationImageView extends ResizableImageView {
         BoundingBox absoluteBounds = displayToAbsoluteBounds(dragRectangle);
         log.debug("absoluteBounds={}", absoluteBounds);
 
-        int defaultDuration = application().settings().annotations().display().timeWindow() * 1000;
-        Annotation annotation = new Annotation(mousePressedTime, mousePressedTime + defaultDuration, absoluteBounds);
+        Annotation annotation = new Annotation(mousePressedTime, absoluteBounds);
         log.debug("annotation={}", annotation);
 
         if (onNewAnnotation != null) {

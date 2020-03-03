@@ -170,7 +170,7 @@ final public class AnnotationController {
         return new Annotation(
             localization.getLocalizationUuid(),
             localization.getElapsedTime().toMillis(),
-            localization.getEndTime().toMillis(),
+            localizationDuration(localization.getDuration().toMillis()),
             new BoundingBox(
                 localization.getX(),
                 localization.getY(),
@@ -183,5 +183,9 @@ final public class AnnotationController {
 
     private int intValue(Double d) {
         return d.intValue();
+    }
+
+    private long localizationDuration(long toMillis) {
+        return toMillis > 0 ? toMillis : application().settings().annotations().display().timeWindow() * 1000;
     }
 }

@@ -55,13 +55,15 @@ public class Annotation {
 
     /**
      * Create a video annotation, without a caption.
+     * <p>
+     * The end time will be set to the same value as the start time (this is OK as when annotations are rendered there is a padding "time window" that will
+     * extend any such zero duration.
      *
      * @param startTime
-     * @param endTime
      * @param bounds area of interest
      */
-    public Annotation(long startTime, long endTime, BoundingBox bounds) {
-        this(UUID.randomUUID(), startTime, endTime, bounds, null);
+    public Annotation(long startTime, BoundingBox bounds) {
+        this(UUID.randomUUID(), startTime, startTime, bounds, null);
     }
 
     /**

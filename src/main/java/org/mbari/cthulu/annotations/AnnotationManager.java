@@ -21,6 +21,7 @@ import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
+import static org.mbari.cthulu.app.CthulhuApplication.application;
 
 /**
  * Component responsible for providing the annotation/localization instances that are active at any given point in time.
@@ -132,7 +133,7 @@ final class AnnotationManager {
         // Most of the time this will create a lightweight singleton list wrapper, it is only the unlikely case that an annotation has the exact same start and
         // end times that will cause a list concatenation
         annotationsByElapsedTime.merge(
-            Range.closed(annotationToAdd.startTime(), annotationToAdd.endTime()),
+            range(annotationToAdd),
             singletonList(annotationToAdd),
             (annotations1, annotations2) -> concat(annotations1.stream(), annotations2.stream()).collect(toList())
         );
@@ -154,7 +155,7 @@ final class AnnotationManager {
             if (annotations.size() == 1) {
                 // This is the only annotation in the list, confirm that the requested annotation is actually in the list and if so remove the entire list
                 if (annotations.stream().anyMatch(annotation -> annotation.id().equals(annotationToRemove.id()))) {
-                    annotationsByElapsedTime.remove(Range.closed(annotationToRemove.startTime(), annotationToRemove.endTime()));
+                    annotationsByElapsedTime.remove(range(annotationToRemove));
                     removed = true;
                 }
             } else {
@@ -167,6 +168,11 @@ final class AnnotationManager {
             log.warn("Attempt to remove unknown annotation {}", annotationToRemove);
         }
     }
+
+    private Range range(Annotation annotation) {
+        int timeWindow = application().settings().annotations().display().timeWindow() * 1000;
+        return Range.closed(annotation.startTime() - timeWindow, annotation.endTime() + timeWindow);
+    },
 
     @Override
     public String toString() {

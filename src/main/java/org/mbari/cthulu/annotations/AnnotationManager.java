@@ -3,15 +3,13 @@ package org.mbari.cthulu.annotations;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import com.google.common.collect.TreeRangeMap;
-import javafx.geometry.BoundingBox;
 import org.mbari.cthulu.model.Annotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
 import java.util.UUID;
 import java.util.function.BiFunction;
 
@@ -19,7 +17,6 @@ import static com.google.common.base.MoreObjects.toStringHelper;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 import static java.util.stream.Stream.concat;
 import static org.mbari.cthulu.app.CthulhuApplication.application;
 
@@ -54,6 +51,15 @@ final class AnnotationManager {
     private static final Logger log = LoggerFactory.getLogger(AnnotationManager.class);
 
     /**
+     * Maintain a separate map of annotation ids to the time range they are active.
+     * <p>
+     * This map is used because it is not possible to rely on the start time and and time to locate an already existing annotation. This is due to the possibly
+     * varying time window padding settings which extends the start and time by some delta. This map is therefore used to remember the exact range that was used
+     * (which would include the time window value at the instant the annotation was added) so it can be retrieved subsequently by id.
+     */
+    private final Map<UUID, Range<Long>> rangesByUuid = new HashMap<>();
+
+    /**
      * Map of all currently known annotations, keyed by their active time range.
      * <p>
      * This map contains all of the currently known annotation components whether they are currently active (based on their timestamp) or not.
@@ -61,11 +67,6 @@ final class AnnotationManager {
      * The map values are lists of annotations, since although unlikely it is possible that two distinct annotations have the exact same time range.
      */
     private final RangeMap<Long, List<Annotation>> annotationsByElapsedTime = TreeRangeMap.create();
-
-    /**
-     * Identifiers for the annotations that are active, based on the current elapsed time.
-     */
-    private final Set<UUID> activeIds = new HashSet<>();
 
     /**
      * Add a collection of annotations.
@@ -78,6 +79,16 @@ final class AnnotationManager {
     }
 
     /**
+     * Update a collection of annotations.
+     *
+     * @param annotations annotations to update
+     */
+    void update(List<Annotation> annotations) {
+        log.debug("update(annotations={})", annotations);
+        annotations.forEach(this::update);
+    }
+
+    /**
      * Remove a collection of annotations.
      *
      * @param annotations annotations to remove
@@ -87,38 +98,8 @@ final class AnnotationManager {
         annotations.forEach(this::remove);
     }
 
-    Optional<AnnotationChanges> setElapsedTime(long elapsedTime) {
-        log.trace("setElapsedTime(elapsedTime={})", elapsedTime);
-
-        // Start with all annotations that are active for the given time
-        List<Annotation> activeAnnotations = current(elapsedTime);
-
-        // Determine which annotations are newly active, filtering out those that are already tracked
-        List<Annotation> newActiveAnnotations = activeAnnotations.stream()
-            .filter(annotation -> !activeIds.contains(annotation.id()))
-            .collect(toList());
-
-        // From the newly active annotations, extract the unique set of ids and add them to the collection of those that are active
-        Set<UUID> newActiveIds = newActiveAnnotations.stream()
-            .map(Annotation::id)
-            .collect(toSet());
-        activeIds.addAll(newActiveIds);
-
-        // To determine which annotations are no longer active, start with the set of all ids that are currently active (not just the newly added ones)
-        Set<UUID> allActiveIds = activeAnnotations.stream()
-            .map(Annotation::id)
-            .collect(toSet());
-
-        // From the collection of those annotations that are currently active, remove any where their id is not in the set of all currently active ids
-        List<UUID> noLongerActiveIds = activeIds.stream()
-            .filter(id -> !allActiveIds.contains(id))
-            .collect(toList());
-        activeIds.removeAll(noLongerActiveIds);
-
-        return Optional.of(new AnnotationChanges(newActiveAnnotations, noLongerActiveIds));
-    }
-
     List<Annotation> current(long elapsedTime) {
+        log.trace("current(elapsedTime={})", elapsedTime);
         List<Annotation> result = annotationsByElapsedTime.get(elapsedTime);
         return result != null ? result: emptyList();
     }
@@ -126,50 +107,58 @@ final class AnnotationManager {
     /**
      * Add a single annotation.
      *
-     * @param annotationToAdd annotation
+     * @param addedAnnotation annotation
      */
-    private void add(Annotation annotationToAdd) {
-        log.debug("add(annotationToAdd={})", annotationToAdd);
+    private void add(Annotation addedAnnotation) {
+        log.debug("add(addedAnnotation={})", addedAnnotation);
+        Range<Long> range = range(addedAnnotation);
+        rangesByUuid.put(addedAnnotation.id(), range);
         // Most of the time this will create a lightweight singleton list wrapper, it is only the unlikely case that an annotation has the exact same start and
         // end times that will cause a list concatenation
         annotationsByElapsedTime.merge(
-            range(annotationToAdd),
-            singletonList(annotationToAdd),
+            range,
+            singletonList(addedAnnotation),
             (annotations1, annotations2) -> concat(annotations1.stream(), annotations2.stream()).collect(toList())
         );
+    }
+
+    private void update(Annotation updatedAnnotation) {
+        log.debug("update(updatedAnnotation={})", updatedAnnotation);
+        Range<Long> range = rangesByUuid.get(updatedAnnotation.id());
+        if (range == null) {
+            log.warn("Update ignored unknown annotation {}", updatedAnnotation.id());
+            return;
+        }
+        annotationsByElapsedTime.get(range.lowerEndpoint()).stream()
+            .filter(annotation -> annotation.id().equals(updatedAnnotation.id()))
+            .forEach(existingAnnotation -> existingAnnotation.caption(updatedAnnotation.caption().orElse(null)));
     }
 
     /**
      * Remove a single annotation.
      *
-     * @param annotationToRemove annotation
+     * @param removedAnnotation annotation
      */
-    private void remove(Annotation annotationToRemove) {
-        log.debug("remove(annotationToRemove={})", annotationToRemove);
-        boolean removed = false;
-        // Get the list of annotations that have the same start time as the annotation to remove
-        List<Annotation> annotations = annotationsByElapsedTime.get(annotationToRemove.startTime());
-        if (annotations != null) {
-            log.debug("annotations=({})", annotations.size());
-            // Is this the only annotation in the list for this time?
-            if (annotations.size() == 1) {
-                // This is the only annotation in the list, confirm that the requested annotation is actually in the list and if so remove the entire list
-                if (annotations.stream().anyMatch(annotation -> annotation.id().equals(annotationToRemove.id()))) {
-                    annotationsByElapsedTime.remove(range(annotationToRemove));
-                    removed = true;
-                }
-            } else {
-                // This is not the only annotation in the list, so remove it from the list (keeping the list)
-                removed = annotations.removeIf(annotation -> annotation.id().equals(annotationToRemove.id()));
-            }
+    private void remove(Annotation removedAnnotation) {
+        log.debug("remove(removedAnnotation={})", removedAnnotation);
+        Range<Long> range = rangesByUuid.get(removedAnnotation.id());
+        if (range == null) {
+            log.warn("Remove ignored unknown annotation {}", removedAnnotation.id());
+            return;
         }
-        log.debug("removed={}", removed);
-        if (!removed) {
-            log.warn("Attempt to remove unknown annotation {}", annotationToRemove);
+        List<Annotation> inRangeAnnotations = annotationsByElapsedTime.get(range.lowerEndpoint());
+        if (inRangeAnnotations.size() == 1) {
+            // This is the only annotation in the list, so remove the entire list
+            log.debug("Removing last annotation in this range");
+            annotationsByElapsedTime.remove(range);
+        } else {
+            // This is not the only annotation in the list, so iterate the list to find the specific one and remove it
+            log.debug("Removing annotation from range");
+            inRangeAnnotations.removeIf(annotation -> annotation.id().equals(removedAnnotation.id()));
         }
     }
 
-    private Range range(Annotation annotation) {
+    private Range<Long> range(Annotation annotation) {
         int timeWindow = application().settings().annotations().display().timeWindow() * 1000;
         return Range.closed(annotation.startTime() - timeWindow, annotation.endTime() + timeWindow);
     }

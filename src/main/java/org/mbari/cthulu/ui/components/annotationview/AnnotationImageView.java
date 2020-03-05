@@ -18,10 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.mbari.cthulu.app.CthulhuApplication.application;
 import static org.mbari.cthulu.ui.components.annotationview.ResourceFactory.createCursorRectangle;
 import static org.mbari.cthulu.ui.components.annotationview.ResourceFactory.createDragRectangle;
@@ -251,6 +253,10 @@ public class AnnotationImageView extends ResizableImageView {
         annotationsById.put(annotation.id(), annotationComponent);
     }
 
+    public void update(Annotation annotation, AnnotationComponent annotationComponent) {
+        annotationComponent.setCaption(annotation.caption().orElse(null));
+    }
+
     /**
      * Add one or more annotations to the view.
      *
@@ -266,7 +272,7 @@ public class AnnotationImageView extends ResizableImageView {
      *
      * @param idsToRemove collection of unique identifiers of the annotations to remove
      */
-    public void remove(List<UUID> idsToRemove) {
+    public void remove(Set<UUID> idsToRemove) {
         log.debug("remove(idsToRemove={})", idsToRemove);
         List<AnnotationComponent> componentsToRemove = idsToRemove.stream()
             .map(id -> annotationsById.get(id))
@@ -296,5 +302,38 @@ public class AnnotationImageView extends ResizableImageView {
                 BoundingBox absoluteBounds = annotationComponent.annotation().bounds();
                 annotationComponent.setBounds(absoluteToDisplayBounds(absoluteBounds));
             });
+    }
+
+    /**
+     * Set the current annotations.
+     * <p>
+     * This may result in the deletion of no longer active annotations, updates of existing active annotations, or the addition on new active annotations.
+     *
+     * @param activeAnnotations
+     */
+    public void setAnnotations(List<Annotation> activeAnnotations) {
+        log.info("setAnnotations(activeAnnotations={})", activeAnnotations);
+
+        // Start with the set of all currently active ids
+        Set<UUID> allIds = activeAnnotations.stream().map(Annotation::id).collect(toSet());
+        // Remove the annotations that are not in the set of active ids
+        Set<UUID> idsToDelete = annotationsById.keySet().stream()
+            .filter(id -> !allIds.contains(id))
+            .collect(toSet());
+        log.debug("idsToDelete={}", idsToDelete);
+        remove(idsToDelete);
+
+        // Now adds or updates, for each of the current active annotations...
+        activeAnnotations.forEach(annotation -> {
+            // Is there already a visual component for this annotation?
+            AnnotationComponent annotationComponent = annotationsById.get(annotation.id());
+            if (annotationComponent != null) {
+                // We already have a visual component for this, so it must be an update
+                update(annotation, annotationComponent);
+            } else {
+                // We do not already have a visual component fo this, so it must be an add
+                add(annotation);
+            }
+        });
     }
 }

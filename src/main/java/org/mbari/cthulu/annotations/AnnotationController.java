@@ -12,10 +12,13 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 import static org.mbari.cthulu.app.CthulhuApplication.application;
 
 /**
@@ -75,39 +78,44 @@ final public class AnnotationController {
 
     private void handleTimeChanged(long newTime) {
         log.trace("handleTimeChanged(newTime={})", newTime);
-
-        annotationManager.setElapsedTime(newTime).ifPresent(changes -> {
-            Platform.runLater(() -> {
-                if (!changes.removes().isEmpty()) {
-                    annotationView.remove(changes.removes());
-                }
-                if (!changes.adds().isEmpty()) {
-                    annotationView.add(changes.adds());
-                }
-            });
-        });
+        List<Annotation> annotations = annotationManager.current(newTime);
+        Platform.runLater(() -> annotationView.setAnnotations(annotations));
     }
 
     private void handleLocalizationChanged(Change<? extends Localization> change) {
         log.debug("handleLocalizationChanged(change={})", change);
 
         while (change.next()) {
-            if (change.wasRemoved()) {
-                List<? extends Localization> removed = change.getRemoved();
-                log.debug("removed={}", removed);
+            if (change.wasUpdated()) {
+                List<? extends Localization> updated = change.getList().subList(change.getFrom(), change.getTo());
+                log.debug("updated={}", updated);
 
-                List<Annotation> annotations = removed.stream().map(this::localizationToAnnotation).collect(toList());
-                removeAnnotations(annotations);
-            }
+                List<Annotation> annotations = updated.stream().map(this::localizationToAnnotation).collect(Collectors.toList());
+                updateAnnotations(annotations);
+            } else {
+                if (change.wasRemoved()) {
+                    List<? extends Localization> removed = change.getRemoved();
+                    log.debug("removed={}", removed);
 
-            if (change.wasAdded()) {
-                List<? extends Localization> added = change.getAddedSubList();
-                log.debug("added={}", added);
+                    List<Annotation> annotations = removed.stream().map(this::localizationToAnnotation).collect(toList());
+                    removeAnnotations(annotations);
+                }
 
-                List<Annotation> annotations = added.stream().map(this::localizationToAnnotation).collect(toList());
-                addAnnotations(annotations);
+                if (change.wasAdded()) {
+                    List<? extends Localization> added = change.getAddedSubList();
+                    log.debug("added={}", added);
+
+                    List<Annotation> annotations = added.stream().map(this::localizationToAnnotation).collect(toList());
+                    addAnnotations(annotations);
+                }
             }
         }
+    }
+
+    private void updateAnnotations(List<Annotation> annotations) {
+        log.debug("updateAnnotations(annotations={}", annotations);
+
+        annotationManager.update(annotations);
     }
 
     /**
@@ -121,12 +129,10 @@ final public class AnnotationController {
     private void removeAnnotations(List<Annotation> annotations) {
         log.debug("removeAnnotations(annotations={})", annotations);
 
-        List<UUID> removedIds = annotations.stream()
+        Set<UUID> idsToRemove = annotations.stream()
             .map(Annotation::id)
-            .collect(toList());
-
-        annotationView.remove(removedIds);
-
+            .collect(toSet());
+        annotationView.remove(idsToRemove);
         annotationManager.remove(annotations);
     }
 

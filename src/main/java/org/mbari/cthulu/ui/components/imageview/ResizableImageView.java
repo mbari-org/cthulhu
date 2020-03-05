@@ -88,6 +88,7 @@ public class ResizableImageView extends Pane {
     private void imageChanged() {
         log.trace("imageChanged()");
         lastWidth = lastHeight = -1;
+        sizeChanged();
     }
 
     /**

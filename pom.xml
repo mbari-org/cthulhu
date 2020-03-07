@@ -5,9 +5,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.mbari.cthulu</groupId>
-    <artifactId>cthulu</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <groupId>org.mbari.cthulhu</groupId>
+    <artifactId>cthulhu</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
 
     <inceptionYear>2020</inceptionYear>
 

@@ -69,7 +69,7 @@ final public class Localization {
     @Override
     public String toString() {
         return toStringHelper(this)
-            .add("incomingPort", incomingTopic)
+            .add("incomingPort", incomingPort)
             .add("outgoingPort", outgoingPort)
             .add("incomingTopic", incomingTopic)
             .add("outgoingTopic", outgoingTopic)

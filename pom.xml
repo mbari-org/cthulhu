@@ -49,7 +49,7 @@
         <javafx.version>13.0.2</javafx.version>
         <logback.version>1.2.3</logback.version>
         <miglayout.version>5.2</miglayout.version>
-        <rxjava.version>3.0.0-RC9</rxjava.version>
+        <rxjava.version>3.0.0</rxjava.version>
         <vcr4j.version>4.3.1.jre11</vcr4j.version>
         <vlcj.version>4.4.0</vlcj.version>
         <vlcjFileFilters.version>2.0.0</vlcjFileFilters.version>
@@ -176,7 +176,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.4</version>
                 <configuration>
-                    <jlinkImageName>mbari-thing</jlinkImageName>
+                    <jlinkImageName>mbari-cthulhu</jlinkImageName>
                     <launcher>launcher</launcher>
                     <release>${javaVersion}</release>
                     <source>${javaVersion}</source>

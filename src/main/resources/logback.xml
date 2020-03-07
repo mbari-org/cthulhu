@@ -12,7 +12,7 @@
         During development, keep a new timestamped log each time the application is run.
     -->
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>cthulu-${timestamp}.log</file>
+        <file>cthulhu-${timestamp}.log</file>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%-30thread] %-5level %-40logger{40} | %msg%n</pattern>
         </encoder>
@@ -21,7 +21,7 @@
     <!--
         Category for log messages from the native (LibVLC) logger.
     -->
-    <logger name="org.mbari.cthulu.app.NativeLogHandler" level="OFF">
+    <logger name="org.mbari.cthulhu.app.NativeLogHandler" level="OFF">
         <appender-ref ref="STDOUT"/>
     </logger>
 

@@ -1,5 +1,5 @@
 module org.mbari.jfx {
-    exports org.mbari.cthulu to javafx.graphics;
+    exports org.mbari.cthulhu to javafx.graphics;
 
     requires com.google.gson;
     requires com.google.common;

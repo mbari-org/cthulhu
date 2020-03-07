@@ -11,6 +11,8 @@ import static org.mbari.cthulhu.app.CthulhuApplication.application;
  */
 final class ResourceFactory {
 
+    private static final StrokeType STROKE_TYPE = StrokeType.INSIDE;
+
     /**
      * Create a rectangle used to render the annotations cursor.
      *
@@ -37,7 +39,7 @@ final class ResourceFactory {
         rectangle.setFill(null);
         rectangle.setStroke(Color.web(application().settings().annotations().creation().borderColour()));
         rectangle.setStrokeWidth(application().settings().annotations().creation().borderSize());
-        rectangle.setStrokeType(StrokeType.OUTSIDE);
+        rectangle.setStrokeType(STROKE_TYPE);
         rectangle.setManaged(false);
         rectangle.setVisible(false);
         return rectangle;
@@ -58,7 +60,7 @@ final class ResourceFactory {
         rectangle.setFill(null);
         rectangle.setStroke(Color.web(application().settings().annotations().display().borderColour()));
         rectangle.setStrokeWidth(application().settings().annotations().display().borderSize());
-        rectangle.setStrokeType(StrokeType.OUTSIDE);
+        rectangle.setStrokeType(STROKE_TYPE);
         rectangle.setManaged(false);
         rectangle.setVisible(true);
         return rectangle;

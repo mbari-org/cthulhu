@@ -2,6 +2,7 @@ package org.mbari.cthulu.model;
 
 import com.google.common.base.MoreObjects;
 import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +30,7 @@ public class Annotation {
     /**
      * Area of interest, a bounding rectangle and timestamp.
      */
-    private final BoundingBox bounds;
+    private BoundingBox bounds;
 
     /**
      * Optional caption text.
@@ -118,6 +119,15 @@ public class Annotation {
      */
     public final Optional<String> caption() {
         return Optional.ofNullable(caption);
+    }
+
+    /**
+     * Set the area of interest.
+     *
+     * @param bounds area of interest
+     */
+    public final void bounds(BoundingBox bounds) {
+        this.bounds = bounds;
     }
 
     /**

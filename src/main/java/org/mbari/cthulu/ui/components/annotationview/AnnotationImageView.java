@@ -255,6 +255,7 @@ public class AnnotationImageView extends ResizableImageView {
 
     public void update(Annotation annotation, AnnotationComponent annotationComponent) {
         annotationComponent.setCaption(annotation.caption().orElse(null));
+        annotationComponent.setBounds(absoluteToDisplayBounds(annotation.bounds()));
     }
 
     /**

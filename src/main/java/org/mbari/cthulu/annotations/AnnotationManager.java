@@ -131,7 +131,10 @@ final class AnnotationManager {
         }
         annotationsByElapsedTime.get(range.lowerEndpoint()).stream()
             .filter(annotation -> annotation.id().equals(updatedAnnotation.id()))
-            .forEach(existingAnnotation -> existingAnnotation.caption(updatedAnnotation.caption().orElse(null)));
+            .forEach(existingAnnotation -> {
+                existingAnnotation.caption(updatedAnnotation.caption().orElse(null));
+                existingAnnotation.bounds(updatedAnnotation.bounds());
+            });
     }
 
     /**

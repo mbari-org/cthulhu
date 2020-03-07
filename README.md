@@ -20,7 +20,7 @@ environment.
 
 Getting the source:
 ```
-git clone git@github.com:caprica/cthulu.git
+git clone git@github.com:caprica/cthulhu.git
 ```
 
 You should _not_ rely on the stability of this repository and you are on your own if you decide to fork it at the
@@ -111,7 +111,6 @@ reduce the risk of this happening.
 
 The JavaFX implementation on Linux is not as robust as that on macOS, visual artefacts are sometimes noticeable (badly
 rendered JavaFX controls, buffer flickering and so on) - it is not common, but it has been observed.
-
 
 ### macOS
 

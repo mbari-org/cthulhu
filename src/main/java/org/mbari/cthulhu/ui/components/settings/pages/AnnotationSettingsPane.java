@@ -32,12 +32,14 @@ final public class AnnotationSettingsPane extends SettingsPage {
     private final CheckBox enableCursorCheckbox;
     private final TextField cursorSizeTextField;
     private final ColorPicker cursorColourPicker;
-    private final TextField dragBorderSize;
+    private final TextField dragBorderSizeTextField;
     private final ColorPicker dragBorderColourPicker;
-    private final TextField displayBorderSize;
+    private final TextField displayBorderSizeTextField;
     private final ColorPicker displayBorderColourPicker;
     private final TextField timeWindowTextField;
     private final ColorPicker decayBorderColourPicker;
+    private final TextField selectionBorderSizeTextField;
+    private final ColorPicker selectionBorderColourPicker;
     private final TextField captionFontSizeTextField;
     private final ColorPicker captionTextColourPicker;
     private final ColorPicker captionBackgroundColourPicker;
@@ -52,18 +54,22 @@ final public class AnnotationSettingsPane extends SettingsPage {
         cursorSizeTextField.setPrefColumnCount(3);
         cursorColourPicker = new ColorPicker();
 
-        dragBorderSize = new TextField();
-        dragBorderSize.setPrefColumnCount(3);
+        dragBorderSizeTextField = new TextField();
+        dragBorderSizeTextField.setPrefColumnCount(3);
         dragBorderColourPicker = new ColorPicker();
 
-        displayBorderSize = new TextField();
-        displayBorderSize.setPrefColumnCount(3);
+        displayBorderSizeTextField = new TextField();
+        displayBorderSizeTextField.setPrefColumnCount(3);
         displayBorderColourPicker = new ColorPicker();
 
         timeWindowTextField = new TextField();
         timeWindowTextField.setPrefColumnCount(3);
 
         decayBorderColourPicker = new ColorPicker();
+
+        selectionBorderSizeTextField = new TextField();
+        selectionBorderSizeTextField.setPrefColumnCount(3);
+        selectionBorderColourPicker = new ColorPicker();
 
         captionFontSizeTextField = new TextField();
         captionFontSizeTextField.setPrefColumnCount(3);
@@ -90,7 +96,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
         creationPane.add(new ItemLabel("Cursor Colour:"), "width 100::");
         creationPane.add(cursorColourPicker);
         creationPane.add(new ItemLabel("Border Size:"), "width 120::");
-        creationPane.add(dragBorderSize);
+        creationPane.add(dragBorderSizeTextField);
         creationPane.add(new ItemLabel("Border Colour:"), "width 100::");
         creationPane.add(dragBorderColourPicker);
 
@@ -100,7 +106,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
 
         MigPane displayPane = new MigPane("ins 0 12 0 0, wrap 4, gapy 12", "[][]32[][]", "");
         displayPane.add(new ItemLabel("Border Size:"), "width 120::");
-        displayPane.add(displayBorderSize);
+        displayPane.add(displayBorderSizeTextField);
         displayPane.add(new ItemLabel("Border Colour:"), "width 100::");
         displayPane.add(displayBorderColourPicker);
         displayPane.add(new ItemLabel("Time Window:"), "width 120::");
@@ -110,6 +116,15 @@ final public class AnnotationSettingsPane extends SettingsPage {
         displayPane.add(new HelpTextLabel("seconds"), "skip, span 3");
 
         contentPane.add(displayPane);
+
+        contentPane.add(new SectionDivider("Annotation Selection"));
+
+        MigPane selectionPane = new MigPane("ins 0 12 0 0, wrap 4, gapy 12", "[][]32[][]", "");
+        selectionPane.add(new ItemLabel("Border Size:"), "width 120::");
+        selectionPane.add(selectionBorderSizeTextField);
+        selectionPane.add(new ItemLabel("Border Colour:"), "width 100::");
+        selectionPane.add(selectionBorderColourPicker);
+        contentPane.add(selectionPane);
 
         contentPane.add(new SectionDivider("Captions"));
 
@@ -133,12 +148,14 @@ final public class AnnotationSettingsPane extends SettingsPage {
         enableCursorCheckbox.setSelected(settings.annotations().creation().enableCursor());
         cursorSizeTextField.setText(Integer.toString(settings.annotations().creation().cursorSize()));
         cursorColourPicker.setValue(Color.web(settings.annotations().creation().cursorColour()));
-        dragBorderSize.setText(Integer.toString(settings.annotations().creation().borderSize()));
+        dragBorderSizeTextField.setText(Integer.toString(settings.annotations().creation().borderSize()));
         dragBorderColourPicker.setValue(Color.web(settings.annotations().creation().borderColour()));
-        displayBorderSize.setText(Integer.toString(settings.annotations().display().borderSize()));
+        displayBorderSizeTextField.setText(Integer.toString(settings.annotations().display().borderSize()));
         displayBorderColourPicker.setValue(Color.web(settings.annotations().display().borderColour()));
         timeWindowTextField.setText(Integer.toString(settings.annotations().display().timeWindow()));
         decayBorderColourPicker.setValue(Color.web(settings.annotations().display().decayBorderColour()));
+        selectionBorderSizeTextField.setText(Integer.toString(settings.annotations().selection().borderSize()));
+        selectionBorderColourPicker.setValue(Color.web(settings.annotations().selection().borderColour()));
         captionFontSizeTextField.setText(Double.toString(settings.annotations().captions().fontSize()));
         captionTextColourPicker.setValue(Color.web(settings.annotations().captions().textColour()));
         captionBackgroundColourPicker.setValue(Color.web(settings.annotations().captions().backgroundColour()));
@@ -151,12 +168,14 @@ final public class AnnotationSettingsPane extends SettingsPage {
         settings.annotations().creation().enableCursor(enableCursorCheckbox.isSelected());
         settings.annotations().creation().cursorSize(parseInt(cursorSizeTextField.getText()));
         settings.annotations().creation().cursorColour(colorToWebString(cursorColourPicker.getValue()));
-        settings.annotations().creation().borderSize(parseInt(dragBorderSize.getText()));
+        settings.annotations().creation().borderSize(parseInt(dragBorderSizeTextField.getText()));
         settings.annotations().creation().borderColour(colorToWebString(dragBorderColourPicker.getValue()));
-        settings.annotations().display().borderSize(parseInt(displayBorderSize.getText()));
+        settings.annotations().display().borderSize(parseInt(displayBorderSizeTextField.getText()));
         settings.annotations().display().borderColour(colorToWebString(displayBorderColourPicker.getValue()));
         settings.annotations().display().timeWindow(parseInt(timeWindowTextField.getText()));
         settings.annotations().display().decayBorderColour(colorToWebString(decayBorderColourPicker.getValue()));
+        settings.annotations().selection().borderSize(parseInt(selectionBorderSizeTextField.getText()));
+        settings.annotations().selection().borderColour(colorToWebString(selectionBorderColourPicker.getValue()));
         settings.annotations().captions().fontSize(parseDouble(captionFontSizeTextField.getText()));
         settings.annotations().captions().textColour(colorToWebString(captionTextColourPicker.getValue()));
         settings.annotations().captions().backgroundColour(colorToWebString(captionBackgroundColourPicker.getValue()));
@@ -170,18 +189,23 @@ final public class AnnotationSettingsPane extends SettingsPage {
 
         validateRequired(cursorColourPicker, "Cursor colour is required.");
 
-        validateRequired(dragBorderSize, "Drag rectangle border size is required.");
-        validateInteger(dragBorderSize, "Invalid drag rectangle border size: %s");
+        validateRequired(dragBorderSizeTextField, "Drag rectangle border size is required.");
+        validateInteger(dragBorderSizeTextField, "Invalid drag rectangle border size: %s");
 
         validateRequired(dragBorderColourPicker, "Drag border colour is required.");
 
-        validateRequired(displayBorderSize, "Display rectangle border size is required.");
-        validateInteger(displayBorderSize, "Invalid display rectangle border size: %s");
+        validateRequired(displayBorderSizeTextField, "Display rectangle border size is required.");
+        validateInteger(displayBorderSizeTextField, "Invalid display rectangle border size: %s");
 
         validateRequired(displayBorderColourPicker, "Display border colour is required.");
 
         validateRequired(timeWindowTextField, "Time window is required.");
         validateInteger(timeWindowTextField, "Invalid time window: %s");
+
+        validateRequired(decayBorderColourPicker, "Decay border colour is required.");
+
+        validateRequired(selectionBorderSizeTextField, "Selection border size is required.");
+        validateRequired(selectionBorderColourPicker, "Selection border colour is required.");
 
         validateRequired(captionFontSizeTextField, "Caption font size is required.");
         validateDouble(captionFontSizeTextField, "Invalid caption font size: %s");

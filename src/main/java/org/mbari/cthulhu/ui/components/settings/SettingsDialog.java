@@ -31,7 +31,7 @@ final public class SettingsDialog extends Dialog<Boolean> {
 
     private static final String ERROR_DIALOG_STYLESHEET_RESOURCE_NAME = "/org/mbari/cthulhu/css/error-dialog.css";
 
-    private static final int DIALOG_HEIGHT = 580;
+    private static final int DIALOG_HEIGHT = 650;
 
     /**
      * Component used to show the list of available settings pages, and to select which one to show.

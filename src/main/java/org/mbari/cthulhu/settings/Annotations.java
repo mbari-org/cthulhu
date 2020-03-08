@@ -11,6 +11,8 @@ final public class Annotations {
 
     private Display display;
 
+    private Selection selection;
+
     private Captions captions;
 
     /**
@@ -19,6 +21,7 @@ final public class Annotations {
     public Annotations() {
         this.creation = new Creation();
         this.display = new Display();
+        this.selection = new Selection();
         this.captions = new Captions();
     }
 
@@ -30,6 +33,7 @@ final public class Annotations {
     public Annotations(Annotations from) {
         this.creation = new Creation(from.creation);
         this.display = new Display(from.display);
+        this.selection = new Selection(from.selection);
         this.captions = new Captions(from.captions);
     }
 
@@ -41,6 +45,10 @@ final public class Annotations {
         return display;
     }
 
+    public Selection selection() {
+        return selection;
+    }
+
     public Captions captions() {
         return captions;
     }
@@ -50,6 +58,7 @@ final public class Annotations {
         return toStringHelper(this)
             .add("creation", creation)
             .add("display", display)
+            .add("selection", selection)
             .add("captions", captions)
             .toString();
     }

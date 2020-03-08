@@ -62,8 +62,6 @@ class PlayerComponentStage extends Stage {
 
     private final PlayerDefaultView defaultView;
 
-    private final MainMenu mainMenu;
-
     PlayerComponentStage(PlayerComponent playerComponent, AnnotationImageView annotationImageView, MediaPlayerControls mediaPlayerControls) {
         this.playerComponent = playerComponent;
         this.videoView = annotationImageView;
@@ -73,13 +71,11 @@ class PlayerComponentStage extends Stage {
 
         defaultView = new PlayerDefaultView();
         videoView.setVisible(false);
-        mainMenu = new MainMenu(playerComponent);
 
         StackPane stackPane = new StackPane();
         stackPane.getChildren().addAll(defaultView, annotationImageView);
 
         BorderPane root = new BorderPane();
-        root.setTop(mainMenu);
         root.setCenter(stackPane);
         root.setBottom(mediaPlayerControls);
 

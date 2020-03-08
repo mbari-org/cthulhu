@@ -1,5 +1,6 @@
 package org.mbari.cthulhu.ui.player;
 
+import org.mbari.cthulhu.ui.components.mediaplayer.FrameCaptureButton;
 import org.mbari.cthulhu.ui.components.mediaplayer.PlayPauseButton;
 import org.tbee.javafx.scene.layout.MigPane;
 
@@ -17,6 +18,8 @@ final class MediaPlayerControls extends MigPane {
 
     private final PlayPauseButton playPauseButton;
 
+    private final FrameCaptureButton frameCaptureButton;
+
     private final TimelineComponent timelineComponent;
 
     /**
@@ -31,10 +34,12 @@ final class MediaPlayerControls extends MigPane {
 
         volumeControls = new MediaPlayerVolumeControls(playerComponent);
         playPauseButton = new PlayPauseButton(playerComponent.mediaPlayer());
+        frameCaptureButton = new FrameCaptureButton(playerComponent.mediaPlayer());
         timelineComponent = new TimelineComponent(playerComponent);
 
         add(volumeControls);
-        add(playPauseButton, "wrap");
+        add(playPauseButton);
+        add(frameCaptureButton, "wrap");
         add(timelineComponent, "span 3, grow");
 
         getStyleClass().add("media-player-controls");

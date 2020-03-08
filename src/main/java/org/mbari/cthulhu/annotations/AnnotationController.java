@@ -52,7 +52,6 @@ final public class AnnotationController {
             .filtered(localization -> playerComponent.uuid().equals(localization.getVideoReferenceUuid()))
             .addListener(this::handleLocalizationChanged);
 
-        // FIXME this event source delivers per second, we want as fine grained as possible here
         playerComponent.eventSource().time().subscribe(this::handleTimeChanged);
     }
 

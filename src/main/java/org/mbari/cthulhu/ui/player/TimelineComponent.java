@@ -52,7 +52,7 @@ final class TimelineComponent extends MigPane {
 
         durationLabel.setMode(application().settings().mediaPlayer().timeDisplay());
 
-        playerComponent.eventSource().time().distinctUntilChanged().subscribe(this::setTime);
+        playerComponent.eventSource().timeSeconds().distinctUntilChanged().subscribe(this::setTime);
         playerComponent.eventSource().position().distinctUntilChanged().subscribe(this::setPosition);
     }
 

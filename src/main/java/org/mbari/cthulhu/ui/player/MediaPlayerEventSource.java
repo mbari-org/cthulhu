@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  * It is desirable therefore to have a single source of truth for the time and position values that are reliably updated
  * in all of the different scenarios just described.
  * <p>
- * Other components that are interested in time and/or position events use {@link #time()} or {@link #position()} to
+ * Other components that are interested in time and/or position events use {@link #timeSeconds()} or {@link #position()} to
  * get a reference to an {@link Observable} that may be subscribed to in order to receive those events.
  * <p>
  * There are similar concerns with volume changes.
@@ -33,12 +33,19 @@ final public class MediaPlayerEventSource {
     private static final Logger log = LoggerFactory.getLogger(MediaPlayerEventSource.class);
 
     /**
+     * A time source that sends <em>every</em> time change notification from the media player.
+     * <p>
+     * The time events may be somewhat irregular, but they are the most accurate available from the media player.
+     */
+    private final PublishSubject<Long> time = PublishSubject.create();
+
+    /**
      * A (slightly more) stable source of time events, used to update the various media player timers.
      * <p>
      * This will be updated with regular per-second changes from the media player, and immediate changes from any user
      * interactions (like seeking).
      */
-    private final PublishSubject<Long> time = PublishSubject.create();
+    private final PublishSubject<Long> timeSeconds = PublishSubject.create();
 
     /**
      * Source of position events, used to update the media player timeline.
@@ -67,8 +74,9 @@ final public class MediaPlayerEventSource {
      */
     void newTime(long time) {
         log.trace("newTime(time={})", time);
+        this.time.onNext(time);
         long newSeconds = Math.round((double) time / 1000);
-        this.time.onNext(newSeconds * 1000);
+        this.timeSeconds.onNext(newSeconds * 1000);
     }
 
     /**
@@ -98,6 +106,15 @@ final public class MediaPlayerEventSource {
      */
     public Observable<Long> time() {
         return time;
+    }
+
+    /**
+     * Get an observable for changes to the time, per second..
+     *
+     * @return time observable
+     */
+    public Observable<Long> timeSeconds() {
+        return timeSeconds;
     }
 
     /**

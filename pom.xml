@@ -13,7 +13,6 @@
 
     <packaging>jar</packaging>
 
-    <!-- FIXME confirm license for MBARI, but vlcj is GPL 3.0 and this can't be changed -->
     <licenses>
         <license>
             <name>GPL v3</name>

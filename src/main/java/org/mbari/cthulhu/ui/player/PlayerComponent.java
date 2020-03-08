@@ -124,7 +124,7 @@ public final class PlayerComponent {
 
             @Override
             public void elementaryStreamAdded(MediaPlayer mediaPlayer, TrackType type, int id) {
-                log.debug("elementaryStreamAdded(type={}, id={})", type, id);
+                log.trace("elementaryStreamAdded(type={}, id={})", type, id);
                 if (type == TrackType.VIDEO && id != -1) {
                     Platform.runLater(PlayerComponent.this::showVideoView);
                 }
@@ -132,7 +132,7 @@ public final class PlayerComponent {
 
             @Override
             public void elementaryStreamSelected(MediaPlayer mediaPlayer, TrackType type, int id) {
-                log.debug("elementaryStreamSelected(type={}, id={})", type, id);
+                log.trace("elementaryStreamSelected(type={}, id={})", type, id);
                 if (type == TrackType.VIDEO && id != -1) {
                     // This is the earliest point in the media/media-player lifecycle that the track info is available
                     VideoTrackInfo videoTrackInfo = mediaPlayer.media().info().videoTracks().get(0);
@@ -149,7 +149,7 @@ public final class PlayerComponent {
 
             @Override
             public void lengthChanged(MediaPlayer mediaPlayer, long newLength) {
-                log.debug("lengthChanged(newLength={})", newLength);
+                log.trace("lengthChanged(newLength={})", newLength);
                 setLength(newLength);
             }
 

@@ -241,7 +241,7 @@ public class AnnotationImageView extends ResizableImageView {
      * @param annotation annotation to add
      */
     public void add(Annotation annotation) {
-        log.debug("add(annotation={})", annotation);
+        log.trace("add(annotation={})", annotation);
         if (annotationsById.containsKey(annotation.id())) {
             log.debug("Not adding already added annotation with same UUID");
             return;
@@ -264,7 +264,7 @@ public class AnnotationImageView extends ResizableImageView {
      * @param annotations annotations to add
      */
     public void add(List<Annotation> annotations) {
-        log.debug("add(annotations={})", annotations);
+        log.trace("add(annotations={})", annotations);
         annotations.forEach(this::add);
     }
 
@@ -274,12 +274,12 @@ public class AnnotationImageView extends ResizableImageView {
      * @param idsToRemove collection of unique identifiers of the annotations to remove
      */
     public void remove(Set<UUID> idsToRemove) {
-        log.debug("remove(idsToRemove={})", idsToRemove);
+        log.trace("remove(idsToRemove={})", idsToRemove);
         List<AnnotationComponent> componentsToRemove = idsToRemove.stream()
             .map(id -> annotationsById.get(id))
             .filter(Objects::nonNull)
             .collect(toList());
-        log.debug("componentsToRemove={}", componentsToRemove);
+        log.trace("componentsToRemove={}", componentsToRemove);
         getChildren().removeAll(componentsToRemove);
         idsToRemove.forEach(annotationsById::remove);
     }
@@ -304,7 +304,7 @@ public class AnnotationImageView extends ResizableImageView {
      * @param activeAnnotations
      */
     public void setAnnotations(List<Annotation> activeAnnotations) {
-        log.info("setAnnotations(activeAnnotations={})", activeAnnotations);
+        log.trace("setAnnotations(activeAnnotations={})", activeAnnotations);
 
         // Start with the set of all currently active ids
         Set<UUID> allIds = activeAnnotations.stream().map(Annotation::id).collect(toSet());
@@ -312,7 +312,7 @@ public class AnnotationImageView extends ResizableImageView {
         Set<UUID> idsToDelete = annotationsById.keySet().stream()
             .filter(id -> !allIds.contains(id))
             .collect(toSet());
-        log.debug("idsToDelete={}", idsToDelete);
+        log.trace("idsToDelete={}", idsToDelete);
         remove(idsToDelete);
 
         // Now adds or updates, for each of the current active annotations...

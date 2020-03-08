@@ -164,7 +164,7 @@ final class MediaPlayerPositionControl extends Slider {
      * @param newSeekable <code>true</code> if the current media is seekable; <code>false</code> if it is not
      */
     private void setSeekable(boolean newSeekable) {
-        log.debug("setSeekable(seekable={})", newSeekable);
+        log.trace("setSeekable(seekable={})", newSeekable);
         setDisable(!newSeekable);
     }
 

@@ -1,5 +1,7 @@
 package org.mbari.cthulhu.settings;
 
+import com.google.common.base.Objects;
+
 import static com.google.common.base.MoreObjects.toStringHelper;
 
 /**
@@ -64,6 +66,22 @@ final public class Localization {
 
     public void outgoingTopic(String outgoingTopic) {
         this.outgoingTopic = outgoingTopic;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (!getClass().equals(obj.getClass())) {
+            return false;
+        }
+        Localization other = (Localization) obj;
+        return
+            Objects.equal(incomingPort, other.incomingPort) &&
+            Objects.equal(outgoingPort, other.outgoingPort) &&
+            Objects.equal(incomingTopic, other.incomingTopic) &&
+            Objects.equal(outgoingTopic, other.outgoingTopic);
     }
 
     @Override

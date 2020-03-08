@@ -54,6 +54,6 @@ final public class OpenLocalApplicationButton extends ApplicationButton {
     private static void openFile(File file) {
         log.debug("openFile(file={})", file);
         PlayerComponent playerComponent = application().open();
-        playerComponent.mediaPlayer().media().play(file.getAbsolutePath());
+        playerComponent.playNewMedia(file.getAbsolutePath());
     }
 }

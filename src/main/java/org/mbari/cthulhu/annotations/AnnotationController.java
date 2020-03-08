@@ -74,6 +74,13 @@ final public class AnnotationController {
         application().localization().addLocalization(annotationToLocalization(annotation));
     }
 
+    public void reset() {
+        log.info("reset()");
+
+        annotationManager.reset();
+        annotationView.reset();
+    }
+
     private void handleTimeChanged(long newTime) {
         log.trace("handleTimeChanged(newTime={})", newTime);
         List<Annotation> annotations = annotationManager.current(newTime);

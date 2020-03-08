@@ -284,15 +284,6 @@ public class AnnotationImageView extends ResizableImageView {
         idsToRemove.forEach(annotationsById::remove);
     }
 
-    /**
-     * Remove all annotations.
-     */
-    public void clear() {
-        log.debug("clear()");
-        getChildren().removeAll(annotationsById.values());
-        annotationsById = new HashMap<>();
-    }
-
     @Override
     protected void onNewSize() {
         log.trace("onNewSize()");
@@ -336,5 +327,15 @@ public class AnnotationImageView extends ResizableImageView {
                 add(annotation);
             }
         });
+    }
+
+    /**
+     * Reset the view, removing all annotations.
+     */
+    public void reset() {
+        log.info("reset()");
+
+        getChildren().removeAll(annotationsById.values());
+        annotationsById = new HashMap<>();
     }
 }

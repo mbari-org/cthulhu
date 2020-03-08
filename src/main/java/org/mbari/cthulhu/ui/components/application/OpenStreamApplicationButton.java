@@ -33,7 +33,7 @@ final public class OpenStreamApplicationButton extends ApplicationButton {
             .filter(response -> response)
             .ifPresent(response -> {
                 PlayerComponent playerComponent = application().open();
-                playerComponent.mediaPlayer().media().play(streamDialog.getStreamUrl());
+                playerComponent.playNewMedia(streamDialog.getStreamUrl());
             });
     }
 }

@@ -179,8 +179,7 @@ class PlayerComponentStage extends Stage {
             File droppedFile = dragEvent.getDragboard().getFiles().get(0);
             log.debug("droppedFile={}", droppedFile);
             dragEvent.setDropCompleted(true);
-            // FIXME might need to send an event instead e.g. if common behaviours when playing a new media
-            playerComponent.mediaPlayer().media().play(droppedFile.getAbsolutePath());
+            playerComponent.playNewMedia(droppedFile.getAbsolutePath());
         } else {
             dragEvent.setDropCompleted(false);
         }

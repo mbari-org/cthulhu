@@ -46,7 +46,7 @@ final class CthulhuClientController implements ClientController {
     @Override
     public boolean open(UUID uuid, URL url) {
         log.debug("open(uuid={}, url={})", uuid, url);
-        return platformExecute(() -> application().playerComponents().open(uuid).mediaPlayer().media().play(convertMrl(url)));
+        return platformExecute(() -> application().playerComponents().open(uuid).playNewMedia(convertMrl(url)));
     }
 
     @Override

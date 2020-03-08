@@ -174,8 +174,7 @@ final class MainMenu extends MenuBar {
         File selectedFile = fileChooser.showOpenDialog(getScene().getWindow());
         if (selectedFile != null) {
             fileChooser.setInitialDirectory(selectedFile.getParentFile());
-            // FIXME this may need to go via an application() event in case we have some behaviours to init/reset when playing media
-            playerComponent.mediaPlayer().media().play(selectedFile.getAbsolutePath());
+            playerComponent.playNewMedia(selectedFile.getAbsolutePath());
         }
     }
 
@@ -188,7 +187,7 @@ final class MainMenu extends MenuBar {
         String clipboard = Clipboard.getSystemClipboard().getString();
         log.debug("clipboard={}", clipboard);
         if (!Strings.isNullOrEmpty(clipboard)) {
-            playerComponent.mediaPlayer().media().play(clipboard);
+            playerComponent.playNewMedia(clipboard);
         }
     }
 

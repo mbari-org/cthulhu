@@ -98,10 +98,25 @@ final class AnnotationManager {
         annotations.forEach(this::remove);
     }
 
+    /**
+     * Get the list of annotations active given a specific time.
+     *
+     * @param elapsedTime time
+     * @return list of annotations active for the given time
+     */
     List<Annotation> current(long elapsedTime) {
         log.trace("current(elapsedTime={})", elapsedTime);
         List<Annotation> result = annotationsByElapsedTime.get(elapsedTime);
         return result != null ? result: emptyList();
+    }
+
+    /**
+     * Remove all annotations.
+     */
+    void reset() {
+        log.debug("reset()");
+        annotationsByElapsedTime.clear();
+        rangesByUuid.clear();
     }
 
     /**

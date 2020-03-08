@@ -105,7 +105,7 @@ final public class MainStage extends Stage {
     private static void openFile(File file) {
         log.debug("openFile(file={})", file);
         PlayerComponent playerComponent = application().open();
-        playerComponent.mediaPlayer().media().play(file.getAbsolutePath());
+        playerComponent.playNewMedia(file.getAbsolutePath());
     }
 
     /**
@@ -117,7 +117,7 @@ final public class MainStage extends Stage {
         log.debug("clipboard={}", clipboard);
         if (!Strings.isNullOrEmpty(clipboard)) {
             PlayerComponent playerComponent = application().open();
-            playerComponent.mediaPlayer().media().play(clipboard);
+            playerComponent.playNewMedia(clipboard);
         }
     }
 

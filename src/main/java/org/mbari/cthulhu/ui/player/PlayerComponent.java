@@ -276,6 +276,15 @@ public final class PlayerComponent {
         stage.toFront();
     }
 
+    public boolean playNewMedia(String mrl) {
+        log.debug("playNewMedia(mrl={})", mrl);
+        boolean result = mediaPlayer.media().play(mrl);
+        if (result) {
+            annotationController.reset();
+        }
+        return result;
+    }
+
     /**
      * Close this player component.
      */

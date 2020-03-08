@@ -68,6 +68,6 @@ public class CthulhuLauncher extends Application {
     private static void openFile(String file) {
         log.debug("openFile(file={})", file);
         PlayerComponent playerComponent = application().open();
-        playerComponent.mediaPlayer().media().play(file);
+        playerComponent.playNewMedia(file);
     }
 }

@@ -117,6 +117,6 @@ final class MediaPlayerVolumeControls extends MigPane {
      */
     private void setMuted(boolean newMuted) {
         log.debug("setMuted(newMuted={}", newMuted);
-        // FIXME update some control? this may not be needed, it may use zero volume instead (needs checking)
+        // Unused
     }
 }

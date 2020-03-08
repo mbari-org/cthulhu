@@ -4,6 +4,7 @@ import com.google.common.base.Strings;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import org.mbari.cthulhu.model.Annotation;
 
@@ -81,9 +82,9 @@ class AnnotationComponent extends Group {
     }
 
     final void settingsChanged() {
-        // FIXME reapply settings to all components
-//        rectangle.applySettings();
-//        linkComponent.applySettings();
+        rectangle.setStroke(Color.web(application().settings().annotations().display().borderColour()));
+        rectangle.setStrokeWidth(application().settings().annotations().display().borderSize());
+
         captionComponent.applySettings();
     }
 

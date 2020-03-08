@@ -1,0 +1,35 @@
+.error-dialog {
+    -fx-background-color: '#323232';
+    -fx-pref-width: 500;
+}
+
+.error-dialog .label {
+    -fx-text-fill: '#939598';
+}
+
+.error-dialog .label.heading {
+    -fx-font-weight: bold;
+}
+
+.error-dialog .button {
+    -fx-background-color: transparent;
+    -fx-border-color: '#939598';
+    -fx-border-width: 1;
+    -fx-text-fill: '#939598';
+}
+
+.error-dialog .button:focused {
+    -fx-border-color: '#3d6185';
+}
+
+.error-dialog .button:hover {
+    -fx-text-fill: 'white';
+}
+
+.error-dialog:header *.header-panel {
+    -fx-background-color: '#323232';
+}
+
+.error-dialog:header *.header-panel *.label {
+    -fx-text-fill: '#939598';
+}

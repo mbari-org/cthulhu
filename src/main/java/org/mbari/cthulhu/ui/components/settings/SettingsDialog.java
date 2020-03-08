@@ -29,6 +29,8 @@ final public class SettingsDialog extends Dialog<Boolean> {
 
     private static final String STYLESHEET_RESOURCE_NAME = "/org/mbari/cthulhu/css/settings-dialog.css";
 
+    private static final String ERROR_DIALOG_STYLESHEET_RESOURCE_NAME = "/org/mbari/cthulhu/css/error-dialog.css";
+
     private static final int DIALOG_HEIGHT = 580;
 
     /**
@@ -105,8 +107,10 @@ final public class SettingsDialog extends Dialog<Boolean> {
                 event.consume();
 
                 Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.getDialogPane().getStylesheets().add(getClass().getResource(ERROR_DIALOG_STYLESHEET_RESOURCE_NAME).toExternalForm());
+                alert.getDialogPane().getStyleClass().add("error-dialog");
                 alert.setTitle("Settings Validation Error");
-                alert.setHeaderText("Invalid settings value entered.");
+                alert.setHeaderText("Invalid settings value.");
                 alert.setContentText(e.getMessage());
                 alert.showAndWait();
             }

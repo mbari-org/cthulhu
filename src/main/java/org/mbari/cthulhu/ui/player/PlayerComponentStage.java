@@ -44,6 +44,10 @@ class PlayerComponentStage extends Stage {
 
     private static final int DEFAULT_HEIGHT = 850;
 
+    private static final int MINIMUM_WIDTH = 400;
+
+    private static final int MINIMUM_HEIGHT = 200;
+
     /**
      * Source of jog/skip events.
      * <p>
@@ -91,6 +95,9 @@ class PlayerComponentStage extends Stage {
             setWidth(DEFAULT_WIDTH);
             setHeight(DEFAULT_HEIGHT);
         }
+
+        setMinWidth(MINIMUM_WIDTH);
+        setMinHeight(MINIMUM_HEIGHT);
 
         // Global key-bindings
         bind(scene, application().keyMap().shortSkip(), () -> jog.onNext(Jog.SHORT_SKIP));

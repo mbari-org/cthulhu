@@ -16,6 +16,8 @@ final public class Captions {
 
     private String backgroundColour;
 
+    private String defaultValue;
+
     /**
      * Create settings with default values.
      */
@@ -23,6 +25,7 @@ final public class Captions {
         this.fontSize = 20.0d;
         this.textColour = colorToWebString(Color.WHITE);
         this.backgroundColour = colorToWebString(Color.color(0, 0, 0, 0.5));
+        this.defaultValue = "Concept";
     }
 
     /**
@@ -34,6 +37,7 @@ final public class Captions {
         this.fontSize = from.fontSize;
         this.textColour = from.textColour;
         this.backgroundColour = from.backgroundColour;
+        this.defaultValue = from.defaultValue;
     }
 
     public double fontSize() {
@@ -60,12 +64,21 @@ final public class Captions {
         this.backgroundColour = backgroundColour;
     }
 
+    public String defaultValue() {
+        return defaultValue;
+    }
+
+    public void defaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
     @Override
     public String toString() {
         return toStringHelper(this)
             .add("fontSize", fontSize)
             .add("textColour", textColour)
             .add("backgroundColour", backgroundColour)
+            .add("defaultValue", defaultValue)
             .toString();
     }
 }

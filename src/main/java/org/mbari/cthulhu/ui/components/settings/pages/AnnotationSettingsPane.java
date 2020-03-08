@@ -41,6 +41,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
     private final TextField captionFontSizeTextField;
     private final ColorPicker captionTextColourPicker;
     private final ColorPicker captionBackgroundColourPicker;
+    private final TextField defaultCaptionTextField;
 
     public AnnotationSettingsPane() {
         super(HEADING_TEXT, PROMPT_TEXT);
@@ -68,6 +69,9 @@ final public class AnnotationSettingsPane extends SettingsPage {
         captionFontSizeTextField.setPrefColumnCount(3);
         captionTextColourPicker = new ColorPicker();
         captionBackgroundColourPicker = new ColorPicker();
+
+        defaultCaptionTextField = new TextField();
+        defaultCaptionTextField.setPrefColumnCount(15);
 
         setContent(createContent());
     }
@@ -99,7 +103,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
         displayPane.add(displayBorderSize);
         displayPane.add(new ItemLabel("Border Colour:"), "width 100::");
         displayPane.add(displayBorderColourPicker);
-        displayPane.add(new ItemLabel("Time Window:"), "width 100::");
+        displayPane.add(new ItemLabel("Time Window:"), "width 120::");
         displayPane.add(timeWindowTextField);
         displayPane.add(new ItemLabel("Decay Colour:"), "width 100::");
         displayPane.add(decayBorderColourPicker);
@@ -116,6 +120,8 @@ final public class AnnotationSettingsPane extends SettingsPage {
         captionsPane.add(captionTextColourPicker);
         captionsPane.add(new ItemLabel("Background:"), "width 100::, skip 2");
         captionsPane.add(captionBackgroundColourPicker);
+        captionsPane.add(new ItemLabel("Default value:"), "width 120::");
+        captionsPane.add(defaultCaptionTextField, "span 3, grow");
         contentPane.add(captionsPane);
 
         return contentPane;
@@ -136,6 +142,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
         captionFontSizeTextField.setText(Double.toString(settings.annotations().captions().fontSize()));
         captionTextColourPicker.setValue(Color.web(settings.annotations().captions().textColour()));
         captionBackgroundColourPicker.setValue(Color.web(settings.annotations().captions().backgroundColour()));
+        defaultCaptionTextField.setText(settings.annotations().captions().defaultValue());
     }
 
     @Override
@@ -153,10 +160,36 @@ final public class AnnotationSettingsPane extends SettingsPage {
         settings.annotations().captions().fontSize(parseDouble(captionFontSizeTextField.getText()));
         settings.annotations().captions().textColour(colorToWebString(captionTextColourPicker.getValue()));
         settings.annotations().captions().backgroundColour(colorToWebString(captionBackgroundColourPicker.getValue()));
+        settings.annotations().captions().defaultValue(defaultCaptionTextField.getText());
     }
 
     @Override
     public void validateSettings() throws SettingsValidationException {
-        // FIXME pending
+        validateRequired(cursorSizeTextField, "Cursor size is required.");
+        validateInteger(cursorSizeTextField, "Invalid cursor size: %s");
+
+        validateRequired(cursorColourPicker, "Cursor colour is required.");
+
+        validateRequired(dragBorderSize, "Drag rectangle border size is required.");
+        validateInteger(dragBorderSize, "Invalid drag rectangle border size: %s");
+
+        validateRequired(dragBorderColourPicker, "Drag border colour is required.");
+
+        validateRequired(displayBorderSize, "Display rectangle border size is required.");
+        validateInteger(displayBorderSize, "Invalid display rectangle border size: %s");
+
+        validateRequired(displayBorderColourPicker, "Display border colour is required.");
+
+        validateRequired(timeWindowTextField, "Time window is required.");
+        validateInteger(timeWindowTextField, "Invalid time window: %s");
+
+        validateRequired(captionFontSizeTextField, "Caption font size is required.");
+        validateDouble(captionFontSizeTextField, "Invalid caption font size: %s");
+
+        validateRequired(captionTextColourPicker, "Caption text colour is required.");
+
+        validateRequired(captionBackgroundColourPicker, "Caption background colour is required.");
+
+        // Caption text can be optional
     }
 }

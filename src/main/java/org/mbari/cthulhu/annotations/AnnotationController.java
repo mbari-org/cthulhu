@@ -28,8 +28,6 @@ final public class AnnotationController {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotationController.class);
 
-    private static final String DEFAULT_CONCEPT = "Annotation"; // FIXME configured?
-
     /**
      * Support component that manages all of the known annotations and provides those that are currently active given a particular timestamp.
      */
@@ -66,7 +64,7 @@ final public class AnnotationController {
     public void annotationCreated(Annotation annotation) {
         log.info("annotationCreated(annotation={})", annotation);
 
-        annotation.caption(DEFAULT_CONCEPT);
+        annotation.caption(application().settings().annotations().captions().defaultValue());
 
         // Immediately add the new annotation to the view
         annotationView.add(annotation);

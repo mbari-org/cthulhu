@@ -1,6 +1,7 @@
 package org.mbari.cthulhu.ui.components.settings;
 
 import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.DialogPane;
@@ -28,7 +29,7 @@ final public class SettingsDialog extends Dialog<Boolean> {
 
     private static final String STYLESHEET_RESOURCE_NAME = "/org/mbari/cthulhu/css/settings-dialog.css";
 
-    private static final int DIALOG_HEIGHT = 550;
+    private static final int DIALOG_HEIGHT = 580;
 
     /**
      * Component used to show the list of available settings pages, and to select which one to show.
@@ -102,6 +103,12 @@ final public class SettingsDialog extends Dialog<Boolean> {
             } catch (SettingsValidationException e) {
                 log.debug("Invalid settings", e);
                 event.consume();
+
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Settings Validation Error");
+                alert.setHeaderText("Invalid settings value entered.");
+                alert.setContentText(e.getMessage());
+                alert.showAndWait();
             }
         });
 

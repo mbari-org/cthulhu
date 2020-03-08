@@ -101,6 +101,17 @@ final public class NetworkSettingsPane extends SettingsPage {
 
     @Override
     public void validateSettings() throws SettingsValidationException {
-        // FIXME pending
+        validateRequired(portNumberTextField, "Port number is required.");
+        validateInteger(portNumberTextField, "Invalid port number: %s.");
+
+        validateRequired(incomingPortTextField, "Incoming localization port is required.");
+        validateInteger(incomingPortTextField, "Invalid incoming localization port number: %s.");
+
+        validateRequired(incomingTopicTextField, "Incoming localization topic is required.");
+
+        validateRequired(outgoingPortTextField, "Outgoing localization port is required.");
+        validateInteger(outgoingPortTextField, "Invalid outgoing localization port number: %s.");
+
+        validateRequired(outgoingTopicTextField, "Outgoing localization topic is required.");
     }
 }

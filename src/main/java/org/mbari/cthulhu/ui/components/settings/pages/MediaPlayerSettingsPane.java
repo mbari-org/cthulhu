@@ -116,6 +116,18 @@ final public class MediaPlayerSettingsPane extends SettingsPage {
 
     @Override
     public void validateSettings() throws SettingsValidationException {
-        // FIXME pending
+        validateRequired(defaultTimeDisplayChoiceBox, "Default time display type is required.");
+
+        validateRequired(normalSkipTextField, "Normal skip time is required.");
+        validateInteger(normalSkipTextField, "Invalid normal skip time value: %s.");
+
+        validateRequired(longSkipTextField, "Long skip time is required.");
+        validateInteger(longSkipTextField, "Invalid long skip time value: %s.");
+
+        validateRequired(skipThrottleTextField, "Skip throttle time is required.");
+        validateInteger(skipThrottleTextField, "Invalid skip throttle time: %s.");
+
+        validateRequired(scrubThrottleTextField, "Scrub throttle time is required.");
+        validateInteger(scrubThrottleTextField, "Invalid scrub throttle time: %s.");
     }
 }

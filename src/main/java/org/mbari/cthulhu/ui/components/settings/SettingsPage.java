@@ -1,9 +1,18 @@
 package org.mbari.cthulhu.ui.components.settings;
 
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import org.mbari.cthulhu.settings.Settings;
 import org.tbee.javafx.scene.layout.MigPane;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
+import static java.lang.String.format;
 
 /**
  * A base component for a settings page.
@@ -81,4 +90,43 @@ abstract public class SettingsPage extends MigPane {
      * @throws SettingsValidationException if invalid settings were detected
      */
     public abstract void validateSettings() throws SettingsValidationException;
+
+    protected final void validateRequired(TextField textField, String message) throws SettingsValidationException {
+        String value = textField.getText();
+        if (isNullOrEmpty(value)) {
+            throw new SettingsValidationException(message, textField);
+        }
+    }
+
+    protected final <T> void validateRequired(ComboBoxBase<T> component, String message) throws SettingsValidationException {
+        T value = component.getValue();
+        if (value == null) {
+            throw new SettingsValidationException(message, component);
+        }
+    }
+
+    protected final <T> void validateRequired(ChoiceBox<T> component, String message) throws SettingsValidationException {
+        T value = component.getValue();
+        if (value == null) {
+            throw new SettingsValidationException(message, component);
+        }
+    }
+
+    protected final void validateInteger(TextField textField, String messageTemplate) throws SettingsValidationException {
+        String value = textField.getText();
+        try {
+            parseInt(value.trim());
+        } catch (NumberFormatException e) {
+            throw new SettingsValidationException(format(messageTemplate, value), textField);
+        }
+    }
+
+    protected final void validateDouble(TextField textField, String messageTemplate) throws SettingsValidationException {
+        String value = textField.getText();
+        try {
+            parseDouble(value.trim());
+        } catch (NumberFormatException e) {
+            throw new SettingsValidationException(format(messageTemplate, value), textField);
+        }
+    }
 }

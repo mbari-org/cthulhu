@@ -68,6 +68,6 @@ final public class InterfaceSettingsPane extends SettingsPage {
 
     @Override
     public void validateSettings() throws SettingsValidationException {
-        // FIXME pending
+        // Nothing to validate
     }
 }

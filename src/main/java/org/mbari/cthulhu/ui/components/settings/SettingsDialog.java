@@ -103,7 +103,7 @@ final public class SettingsDialog extends Dialog<Boolean> {
                 settingsPages.validateSettings();
                 settingsPages.toSettings();
             } catch (SettingsValidationException e) {
-                log.debug("Invalid settings", e);
+                log.debug("Invalid settings: {}", e.getMessage());
                 event.consume();
 
                 Alert alert = new Alert(Alert.AlertType.ERROR);

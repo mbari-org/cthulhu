@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -46,10 +44,11 @@
 
         <guava.version>28.2-jre</guava.version>
         <javafx.version>13.0.2</javafx.version>
+        <jansi.version>1.18</jansi.version>
         <logback.version>1.2.3</logback.version>
         <miglayout.version>5.2</miglayout.version>
         <rxjava.version>3.0.0</rxjava.version>
-        <vcr4j.version>4.3.1.jre11</vcr4j.version>
+        <vcr4j.version>4.3.2.jre11</vcr4j.version>
         <vlcj.version>4.4.0</vlcj.version>
         <vlcjFileFilters.version>2.0.0</vlcjFileFilters.version>
 
@@ -131,6 +130,12 @@
             <artifactId>vcr4j-sharktopoda</artifactId>
             <version>${vcr4j.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.jansi</groupId>
+            <artifactId>jansi</artifactId>
+            <version>${jansi.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

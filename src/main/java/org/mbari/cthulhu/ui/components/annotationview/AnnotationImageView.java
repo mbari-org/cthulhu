@@ -1,5 +1,6 @@
 package org.mbari.cthulhu.ui.components.annotationview;
 
+import javafx.application.Platform;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
 import javafx.scene.input.KeyCode;
@@ -280,7 +281,7 @@ public class AnnotationImageView extends ResizableImageView {
             .filter(Objects::nonNull)
             .collect(toList());
         log.trace("componentsToRemove={}", componentsToRemove);
-        getChildren().removeAll(componentsToRemove);
+        Platform.runLater(() -> getChildren().removeAll(componentsToRemove));
         idsToRemove.forEach(annotationsById::remove);
     }
 

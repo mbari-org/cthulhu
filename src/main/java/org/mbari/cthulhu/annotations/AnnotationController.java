@@ -38,6 +38,8 @@ final public class AnnotationController {
      */
     private final AnnotationImageView annotationView;
 
+    private final UUID videoReferenceUuid;
+
     /**
      * Create an annotations controller.
      *
@@ -46,10 +48,11 @@ final public class AnnotationController {
      */
     public AnnotationController(PlayerComponent playerComponent, AnnotationImageView annotationView) {
         this.annotationView = annotationView;
+        this.videoReferenceUuid = playerComponent.uuid();
 
         application().localization()
             .getLocalizations()
-            .filtered(localization -> playerComponent.uuid().equals(localization.getVideoReferenceUuid()))
+            .filtered(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
             .addListener(this::handleLocalizationChanged);
 
         playerComponent.eventSource().time().subscribe(this::handleTimeChanged);
@@ -161,7 +164,8 @@ final public class AnnotationController {
             annotation.caption().orElse(""),
             Duration.ofMillis(annotation.startTime()),
             annotation.id(),
-            intValue(annotation.bounds().getMaxX()),
+            videoReferenceUuid,
+            intValue(annotation.bounds().getMinX()),
             intValue(annotation.bounds().getMinY()),
             intValue(annotation.bounds().getWidth()),
             intValue(annotation.bounds().getHeight())
@@ -175,10 +179,11 @@ final public class AnnotationController {
      * @return converted annotation
      */
     private Annotation localizationToAnnotation(Localization localization) {
+        long start = localization.getElapsedTime().toMillis();
         return new Annotation(
             localization.getLocalizationUuid(),
-            localization.getElapsedTime().toMillis(),
-            localizationDuration(localization.getDuration().toMillis()),
+            start,
+            start + localizationDuration(localization.getDuration().toMillis()),
             new BoundingBox(
                 localization.getX(),
                 localization.getY(),

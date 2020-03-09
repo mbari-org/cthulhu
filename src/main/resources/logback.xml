@@ -1,10 +1,12 @@
 <configuration>
 
-    <timestamp key="timestamp" datePattern="yyyyMMdd'@'HH:mm:ss"/>
+    <timestamp key="timestamp" datePattern="yyyyMMdd'@'HH:mm:ss" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <withJansi>true</withJansi>
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%-30thread] %-5level %-40logger{40} | %msg%n</pattern>
+            <!-- <pattern>%d{HH:mm:ss.SSS} [%-30thread] %-5level %-40logger{40} | %msg%n</pattern> -->
+            <pattern>%gray(%d{HH:mm:ss.SSS}) [%green(%-30thread)] %highlight(%-5level) %blue(%-40logger{40}) %gray(|) %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -24,10 +26,11 @@
     <logger name="org.mbari.cthulhu.app.NativeLogHandler" level="OFF">
         <appender-ref ref="STDOUT"/>
     </logger>
+    <logger name="org.mbari.cthulu.ui.components.annotationview.AnnotationImageView" level="WARN" />
 
     <root level="debug">
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="FILE"/>
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
     </root>
 
 </configuration>

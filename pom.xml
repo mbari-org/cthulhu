@@ -45,9 +45,10 @@
         <guava.version>28.2-jre</guava.version>
         <javafx.version>13.0.2</javafx.version>
         <jansi.version>1.18</jansi.version>
-        <logback.version>1.2.3</logback.version>
+        <logback.version>1.3.0-alpha4</logback.version>
         <miglayout.version>5.2</miglayout.version>
         <rxjava.version>3.0.0</rxjava.version>
+        <slf4j.version>2.0.0-alpha1</slf4j.version>
         <vcr4j.version>4.3.2.jre11</vcr4j.version>
         <vlcj.version>4.4.0</vlcj.version>
         <vlcjFileFilters.version>2.0.0</vlcjFileFilters.version>
@@ -74,9 +75,15 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

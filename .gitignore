@@ -1,4 +1,11 @@
 *.iml
 *.log
+.classpath
 .idea
-target
+.gradle/
+.project
+.settings/
+.vscode/
+bin/
+build/
+target/

@@ -1,4 +1,4 @@
-module org.mbari.jfx {
+module org.mbari.cthulhu {
     exports org.mbari.cthulhu to javafx.graphics;
 
     requires com.google.gson;
@@ -7,7 +7,7 @@ module org.mbari.jfx {
     requires javafx.controls;
     requires miglayout.javafx;
     requires miglayout.core;
-    requires slf4j.api;
+    requires org.slf4j;
     requires uk.co.caprica.vlcj;
     requires uk.co.caprica.vlcj.filefilters;
     requires vcr4j.sharktopoda.client;

@@ -1,0 +1,6 @@
+remote_theme: pmarsceill/just-the-docs
+search_enabled: true
+aux_links:
+  "Source":
+    - "//github.com/mbari-media-management/Cthulhu"
+# color_scheme: "dark"

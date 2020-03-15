@@ -1,4 +1,6 @@
-# MBARI Cthulhu
+![MBARI logo](docs/images/logo-mbari-3b.png)
+
+# Cthulhu
 
 Cthulhu is a video playback and annotation application developed by the
 [Monteray Bay Aquarium Research Institute](https://mbari.org).

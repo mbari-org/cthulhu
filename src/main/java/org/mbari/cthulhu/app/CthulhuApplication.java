@@ -8,14 +8,20 @@ import org.mbari.cthulhu.app.config.KeyMap;
 import org.mbari.cthulhu.app.config.MediaPlayerConfig;
 import org.mbari.cthulhu.settings.Settings;
 import org.mbari.cthulhu.ui.player.PlayerComponent;
+import org.mbari.vcr4j.sharktopoda.client.localization.Localization;
 import org.mbari.vcr4j.sharktopoda.client.localization.LocalizationController;
+import org.mbari.vcr4j.sharktopoda.client.localization.SelectionController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
 import uk.co.caprica.vlcj.log.NativeLog;
 
+import javax.xml.stream.Location;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.UUID;
 
+import static java.util.stream.Collectors.toList;
 import static org.mbari.cthulhu.app.config.BuildInfo.readBuildInfo;
 import static org.mbari.cthulhu.app.config.KeyMap.readKeyMap;
 import static org.mbari.cthulhu.app.config.MediaPlayerConfig.readMediaPlayerConfig;
@@ -158,6 +164,15 @@ final public class CthulhuApplication {
      */
     public LocalizationController localization() {
         return localizationIo.getController();
+    }
+
+    /**
+     * Get the localization selection component.
+     *
+     * @return selection component
+     */
+    public SelectionController localizationSelection() {
+        return localizationIo.getSelectionController();
     }
 
     /**

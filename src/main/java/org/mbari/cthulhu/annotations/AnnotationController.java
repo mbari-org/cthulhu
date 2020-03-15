@@ -14,7 +14,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -52,8 +51,11 @@ final public class AnnotationController {
 
         application().localization()
             .getLocalizations()
-            .filtered(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
             .addListener(this::handleLocalizationChanged);
+
+        application().localizationSelection()
+            .getSelectedLocalizations()
+            .addListener(this::handleSelectionChanged);
 
         playerComponent.eventSource().time().subscribe(this::handleTimeChanged);
     }
@@ -97,14 +99,20 @@ final public class AnnotationController {
                 List<? extends Localization> updated = change.getList().subList(change.getFrom(), change.getTo());
                 log.debug("updated={}", updated);
 
-                List<Annotation> annotations = updated.stream().map(this::localizationToAnnotation).collect(Collectors.toList());
+                List<Annotation> annotations = updated.stream()
+                    .filter(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
+                    .map(this::localizationToAnnotation)
+                    .collect(toList());
                 updateAnnotations(annotations);
             } else {
                 if (change.wasRemoved()) {
                     List<? extends Localization> removed = change.getRemoved();
                     log.debug("removed={}", removed);
 
-                    List<Annotation> annotations = removed.stream().map(this::localizationToAnnotation).collect(toList());
+                    List<Annotation> annotations = removed.stream()
+                        .filter(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
+                        .map(this::localizationToAnnotation)
+                        .collect(toList());
                     removeAnnotations(annotations);
                 }
 
@@ -112,9 +120,40 @@ final public class AnnotationController {
                     List<? extends Localization> added = change.getAddedSubList();
                     log.debug("added={}", added);
 
-                    List<Annotation> annotations = added.stream().map(this::localizationToAnnotation).collect(toList());
+                    List<Annotation> annotations = added.stream()
+                        .filter(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
+                        .map(this::localizationToAnnotation)
+                        .collect(toList());
                     addAnnotations(annotations);
                 }
+            }
+        }
+    }
+
+    private void handleSelectionChanged(Change<? extends Localization> change) {
+        log.debug("handleSelectionChanged(change={})", change);
+
+        while (change.next()) {
+            if (change.wasRemoved()) {
+                List<? extends Localization> removed = change.getRemoved();
+                log.debug("removed={}", removed);
+
+                List<UUID> annotations = removed.stream()
+                    .filter(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
+                    .map(Localization::getLocalizationUuid)
+                    .collect(toList());
+                removeSelections(annotations);
+            }
+
+            if (change.wasAdded()) {
+                List<? extends Localization> added = change.getAddedSubList();
+                log.debug("added={}", added);
+
+                List<UUID> annotations = added.stream()
+                    .filter(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
+                    .map(Localization::getLocalizationUuid)
+                    .collect(toList());
+                addSelections(annotations);
             }
         }
     }
@@ -151,6 +190,20 @@ final public class AnnotationController {
     private void addAnnotations(List<Annotation> annotations) {
         log.debug("addAnnotations(annotations={})", annotations);
         annotationManager.add(annotations);
+    }
+
+    private void removeSelections(List<UUID> annotations) {
+        log.debug("removeSelections(annotations={}", annotations);
+
+        annotationManager.deselect(annotations);
+        annotationView.deselect(annotations);
+    }
+
+    private void addSelections(List<UUID> annotations) {
+        log.debug("addSelections(annotations={}", annotations);
+
+        annotationManager.select(annotations);
+        annotationView.select(annotations);
     }
 
     /**

@@ -37,6 +37,11 @@ public class Annotation {
     private String caption;
 
     /**
+     *
+     */
+    private boolean selected;
+
+    /**
      * Create a video annotation, with a specific unique identifier and a caption.
      *
      * @param id unique identifier
@@ -51,6 +56,7 @@ public class Annotation {
         this.endTime = endTime;
         this.bounds = bounds;
         this.caption = caption;
+        this.selected = false;
     }
 
     /**
@@ -138,6 +144,14 @@ public class Annotation {
         this.caption = caption;
     }
 
+    public final boolean selected() {
+        return selected;
+    }
+
+    public final void selected(boolean selected) {
+        this.selected = selected;
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -146,6 +160,7 @@ public class Annotation {
             .add("endTime", endTime)
             .add("bounds", bounds)
             .add("caption", caption)
+            .add("selected", selected)
             .toString();
     }
 

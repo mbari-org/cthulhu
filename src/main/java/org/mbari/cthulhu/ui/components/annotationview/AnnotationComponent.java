@@ -25,6 +25,8 @@ class AnnotationComponent extends Group {
 
     private final CaptionComponent captionComponent;
 
+    private boolean selected;
+
     /**
      * Create a video annotation component.
      *
@@ -81,10 +83,20 @@ class AnnotationComponent extends Group {
         repositionComponents();
     }
 
-    final void settingsChanged() {
-        rectangle.setStroke(Color.web(application().settings().annotations().display().borderColour()));
-        rectangle.setStrokeWidth(application().settings().annotations().display().borderSize());
+    final void select(boolean select) {
+        if (select) {
+            this.selected = true;
+            rectangle.setStroke(Color.web(application().settings().annotations().selection().borderColour()));
+            rectangle.setStrokeWidth(application().settings().annotations().selection().borderSize());
+        } else {
+            this.selected = false;
+            rectangle.setStroke(Color.web(application().settings().annotations().display().borderColour()));
+            rectangle.setStrokeWidth(application().settings().annotations().display().borderSize());
+        }
+    }
 
+    final void settingsChanged() {
+        select(this.selected);
         captionComponent.applySettings();
     }
 

@@ -51,6 +51,14 @@ final class AnnotationManager {
     private static final Logger log = LoggerFactory.getLogger(AnnotationManager.class);
 
     /**
+     * Maintain a separate map of annotation ids to the annotation itself.
+     * <p>
+     * This is used for direct lookup instead finding the range then searching the list for that range - useful e.g. when updating the selection status of an
+     * annotation.
+     */
+    private final Map<UUID, Annotation> annotationsByUuid = new HashMap<>();
+
+    /**
      * Maintain a separate map of annotation ids to the time range they are active.
      * <p>
      * This map is used because it is not possible to rely on the start time and and time to locate an already existing annotation. This is due to the possibly
@@ -98,6 +106,16 @@ final class AnnotationManager {
         annotations.forEach(this::remove);
     }
 
+    void select(List<UUID> annotations) {
+        log.debug("select(annotations={})", annotations);
+        annotations.forEach(this::select);
+    }
+
+    void deselect(List<UUID> annotations) {
+        log.debug("deselect(annotations={})", annotations);
+        annotations.forEach(this::deselect);
+    }
+
     /**
      * Get the list of annotations active given a specific time.
      *
@@ -115,6 +133,7 @@ final class AnnotationManager {
      */
     void reset() {
         log.debug("reset()");
+        annotationsByUuid.clear();
         annotationsByElapsedTime.clear();
         rangesByUuid.clear();
     }
@@ -126,6 +145,7 @@ final class AnnotationManager {
      */
     private void add(Annotation addedAnnotation) {
         log.debug("add(addedAnnotation={})", addedAnnotation);
+        annotationsByUuid.put(addedAnnotation.id(), addedAnnotation);
         Range<Long> range = range(addedAnnotation);
         rangesByUuid.put(addedAnnotation.id(), range);
         // Most of the time this will create a lightweight singleton list wrapper, it is only the unlikely case that an annotation has the exact same start and
@@ -139,17 +159,13 @@ final class AnnotationManager {
 
     private void update(Annotation updatedAnnotation) {
         log.debug("update(updatedAnnotation={})", updatedAnnotation);
-        Range<Long> range = rangesByUuid.get(updatedAnnotation.id());
-        if (range == null) {
+        Annotation existingAnnotation = annotationsByUuid.get(updatedAnnotation.id());
+        if (existingAnnotation == null) {
             log.warn("Update ignored unknown annotation {}", updatedAnnotation.id());
             return;
         }
-        annotationsByElapsedTime.get(range.lowerEndpoint()).stream()
-            .filter(annotation -> annotation.id().equals(updatedAnnotation.id()))
-            .forEach(existingAnnotation -> {
-                existingAnnotation.caption(updatedAnnotation.caption().orElse(null));
-                existingAnnotation.bounds(updatedAnnotation.bounds());
-            });
+        existingAnnotation.caption(updatedAnnotation.caption().orElse(null));
+        existingAnnotation.bounds(updatedAnnotation.bounds());
     }
 
     /**
@@ -159,6 +175,7 @@ final class AnnotationManager {
      */
     private void remove(Annotation removedAnnotation) {
         log.debug("remove(removedAnnotation={})", removedAnnotation);
+        annotationsByUuid.remove(removedAnnotation.id());
         Range<Long> range = rangesByUuid.get(removedAnnotation.id());
         if (range == null) {
             log.warn("Remove ignored unknown annotation {}", removedAnnotation.id());
@@ -176,6 +193,26 @@ final class AnnotationManager {
         }
     }
 
+    private void select(UUID id) {
+        log.debug("select(id={})", id);
+        Annotation existingAnnotation = annotationsByUuid.get(id);
+        if (existingAnnotation == null) {
+            log.warn("Select ignored unknown annotation {}", id);
+            return;
+        }
+        existingAnnotation.selected(true);
+    }
+
+    private void deselect(UUID id) {
+        log.debug("deselect(id={})", id);
+        Annotation existingAnnotation = annotationsByUuid.get(id);
+        if (existingAnnotation == null) {
+            log.warn("Deselect ignored unknown annotation {}", id);
+            return;
+        }
+        existingAnnotation.selected(false);
+    }
+
     private Range<Long> range(Annotation annotation) {
         int timeWindow = application().settings().annotations().display().timeWindow() * 1000;
         return Range.closed(annotation.startTime() - timeWindow, annotation.endTime() + timeWindow);
@@ -187,4 +224,5 @@ final class AnnotationManager {
             .add("annotationsByElapsedTime", annotationsByElapsedTime)
             .toString();
     }
+
 }

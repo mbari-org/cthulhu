@@ -248,6 +248,7 @@ public class AnnotationImageView extends ResizableImageView {
             return;
         }
         AnnotationComponent annotationComponent = new AnnotationComponent(annotation);
+        annotationComponent.select(annotation.selected());
         BoundingBox absoluteBounds = annotationComponent.annotation().bounds();
         add(annotationComponent);
         annotationComponent.setBounds(absoluteToDisplayBounds(absoluteBounds));
@@ -283,6 +284,22 @@ public class AnnotationImageView extends ResizableImageView {
         log.trace("componentsToRemove={}", componentsToRemove);
         Platform.runLater(() -> getChildren().removeAll(componentsToRemove));
         idsToRemove.forEach(annotationsById::remove);
+    }
+
+    public void select(List<UUID> annotations) {
+        log.debug("select(annotations={})", annotations);
+        annotations.stream()
+            .map(id -> annotationsById.get(id))
+            .filter(Objects::nonNull)
+            .forEach(annotationComponent -> annotationComponent.select(true));
+    }
+
+    public void deselect(List<UUID> annotations) {
+        log.debug("deselect(annotations={})", annotations);
+        annotations.stream()
+            .map(id -> annotationsById.get(id))
+            .filter(Objects::nonNull)
+            .forEach(annotationComponent -> annotationComponent.select(false));
     }
 
     @Override
@@ -339,4 +356,5 @@ public class AnnotationImageView extends ResizableImageView {
         getChildren().removeAll(annotationsById.values());
         annotationsById = new HashMap<>();
     }
+
 }

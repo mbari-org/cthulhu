@@ -39,6 +39,8 @@ final public class AnnotationController {
 
     private final UUID videoReferenceUuid;
 
+    private long lastTime = -1;
+
     /**
      * Create an annotations controller.
      *
@@ -83,18 +85,21 @@ final public class AnnotationController {
 
         annotationManager.reset();
         annotationView.reset();
+
+        lastTime = -1;
     }
 
     private void handleTimeChanged(long newTime) {
         log.trace("handleTimeChanged(newTime={})", newTime);
-        List<Annotation> annotations = annotationManager.current(newTime);
-        Platform.runLater(() -> annotationView.setAnnotations(annotations));
+        lastTime = newTime;
+        updateAnnotationView(newTime);
     }
 
     private void handleLocalizationChanged(Change<? extends Localization> change) {
         log.debug("handleLocalizationChanged(change={})", change);
 
         while (change.next()) {
+            // Implementation note - updates may no longer be needed as it appears we receive a remove then an add instead
             if (change.wasUpdated()) {
                 List<? extends Localization> updated = change.getList().subList(change.getFrom(), change.getTo());
                 log.debug("updated={}", updated);
@@ -128,6 +133,9 @@ final public class AnnotationController {
                 }
             }
         }
+
+        // Force an update, the media player may be paused
+        updateAnnotationView(lastTime);
     }
 
     private void handleSelectionChanged(Change<? extends Localization> change) {
@@ -136,7 +144,7 @@ final public class AnnotationController {
         while (change.next()) {
             if (change.wasRemoved()) {
                 List<? extends Localization> removed = change.getRemoved();
-                log.debug("removed={}", removed);
+                log.debug("deslected={}", removed);
 
                 List<UUID> annotations = removed.stream()
                     .filter(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
@@ -147,7 +155,7 @@ final public class AnnotationController {
 
             if (change.wasAdded()) {
                 List<? extends Localization> added = change.getAddedSubList();
-                log.debug("added={}", added);
+                log.debug("selected={}", added);
 
                 List<UUID> annotations = added.stream()
                     .filter(localization -> videoReferenceUuid.equals(localization.getVideoReferenceUuid()))
@@ -251,7 +259,19 @@ final public class AnnotationController {
         return d.intValue();
     }
 
+    /**
+     * Set an appropriate end time for the localization.
+     * <p>
+     * If there is a valid duration, use it. Otherwise set a default duration equivalent to the configured annotation display iime window property.
+     *
+     * @param toMillis
+     * @return
+     */
     private long localizationDuration(long toMillis) {
         return toMillis > 0 ? toMillis : application().settings().annotations().display().timeWindow() * 1000;
+    }
+
+    private void updateAnnotationView(long newTime) {
+        Platform.runLater(() -> annotationView.setAnnotations(annotationManager.current(newTime)));
     }
 }

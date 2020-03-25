@@ -156,10 +156,10 @@ public class Annotation {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("id", id)
+            .add("caption", caption)
             .add("startTime", startTime)
             .add("endTime", endTime)
             .add("bounds", bounds)
-            .add("caption", caption)
             .add("selected", selected)
             .toString();
     }

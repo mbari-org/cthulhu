@@ -7,10 +7,13 @@ import org.mbari.cthulhu.model.Annotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiFunction;
 
 import static com.google.common.base.MoreObjects.toStringHelper;
@@ -59,15 +62,6 @@ final class AnnotationManager {
     private final Map<UUID, Annotation> annotationsByUuid = new HashMap<>();
 
     /**
-     * Maintain a separate map of annotation ids to the time range they are active.
-     * <p>
-     * This map is used because it is not possible to rely on the start time and and time to locate an already existing annotation. This is due to the possibly
-     * varying time window padding settings which extends the start and time by some delta. This map is therefore used to remember the exact range that was used
-     * (which would include the time window value at the instant the annotation was added) so it can be retrieved subsequently by id.
-     */
-    private final Map<UUID, Range<Long>> rangesByUuid = new HashMap<>();
-
-    /**
      * Map of all currently known annotations, keyed by their active time range.
      * <p>
      * This map contains all of the currently known annotation components whether they are currently active (based on their timestamp) or not.
@@ -76,6 +70,8 @@ final class AnnotationManager {
      */
     private final RangeMap<Long, List<Annotation>> annotationsByElapsedTime = TreeRangeMap.create();
 
+    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
     /**
      * Add a collection of annotations.
      *
@@ -83,7 +79,12 @@ final class AnnotationManager {
      */
     void add(List<Annotation> annotations) {
         log.debug("add(annotations={})", annotations);
-        annotations.forEach(this::add);
+        lock.writeLock().lock();
+        try {
+            annotations.forEach(this::add);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     /**
@@ -93,7 +94,12 @@ final class AnnotationManager {
      */
     void update(List<Annotation> annotations) {
         log.debug("update(annotations={})", annotations);
-        annotations.forEach(this::update);
+        lock.writeLock().lock();
+        try {
+            annotations.forEach(this::update);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     /**
@@ -103,17 +109,32 @@ final class AnnotationManager {
      */
     void remove(List<Annotation> annotations) {
         log.debug("remove(annotations={})", annotations);
-        annotations.forEach(this::remove);
+        lock.writeLock().lock();
+        try {
+            annotations.forEach(this::remove);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     void select(List<UUID> annotations) {
         log.debug("select(annotations={})", annotations);
-        annotations.forEach(this::select);
+        lock.writeLock().lock();
+        try {
+            annotations.forEach(this::select);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     void deselect(List<UUID> annotations) {
         log.debug("deselect(annotations={})", annotations);
-        annotations.forEach(this::deselect);
+        lock.writeLock().lock();
+        try {
+            annotations.forEach(this::deselect);
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     /**
@@ -124,8 +145,13 @@ final class AnnotationManager {
      */
     List<Annotation> current(long elapsedTime) {
         log.trace("current(elapsedTime={})", elapsedTime);
-        List<Annotation> result = annotationsByElapsedTime.get(elapsedTime);
-        return result != null ? result: emptyList();
+        lock.readLock().lock();
+        try {
+            List<Annotation> result = annotationsByElapsedTime.get(elapsedTime);
+            return result != null ? new ArrayList<>(result): emptyList();
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     /**
@@ -133,9 +159,13 @@ final class AnnotationManager {
      */
     void reset() {
         log.debug("reset()");
-        annotationsByUuid.clear();
-        annotationsByElapsedTime.clear();
-        rangesByUuid.clear();
+        lock.writeLock().lock();
+        try {
+            annotationsByUuid.clear();
+            annotationsByElapsedTime.clear();
+        } finally {
+            lock.writeLock().unlock();
+        }
     }
 
     /**
@@ -147,7 +177,6 @@ final class AnnotationManager {
         log.debug("add(addedAnnotation={})", addedAnnotation);
         annotationsByUuid.put(addedAnnotation.id(), addedAnnotation);
         Range<Long> range = range(addedAnnotation);
-        rangesByUuid.put(addedAnnotation.id(), range);
         // Most of the time this will create a lightweight singleton list wrapper, it is only the unlikely case that an annotation has the exact same start and
         // end times that will cause a list concatenation
         annotationsByElapsedTime.merge(
@@ -175,21 +204,28 @@ final class AnnotationManager {
      */
     private void remove(Annotation removedAnnotation) {
         log.debug("remove(removedAnnotation={})", removedAnnotation);
-        annotationsByUuid.remove(removedAnnotation.id());
-        Range<Long> range = rangesByUuid.get(removedAnnotation.id());
-        if (range == null) {
-            log.warn("Remove ignored unknown annotation {}", removedAnnotation.id());
-            return;
-        }
-        List<Annotation> inRangeAnnotations = annotationsByElapsedTime.get(range.lowerEndpoint());
-        if (inRangeAnnotations.size() == 1) {
-            // This is the only annotation in the list, so remove the entire list
-            log.debug("Removing last annotation in this range");
-            annotationsByElapsedTime.remove(range);
-        } else {
-            // This is not the only annotation in the list, so iterate the list to find the specific one and remove it
-            log.debug("Removing annotation from range");
-            inRangeAnnotations.removeIf(annotation -> annotation.id().equals(removedAnnotation.id()));
+
+        // Get a range sub-map covering the entire period of the annotation that was removed - this sub-map will give us one or more ranges, any number of
+        // which may contain the removed annotation (the same annotation may be present in multiple ranges)
+        RangeMap<Long, List<Annotation>> subMap = annotationsByElapsedTime.subRangeMap(range(removedAnnotation));
+
+        List<Range> obsoleteRanges = new ArrayList<>();
+
+        // Process each range in this sub-map...
+        subMap.asMapOfRanges().forEach((range, list) -> {
+            if (list.size() == 1) {
+                if (list.get(0).id().equals(removedAnnotation.id())) { // Must this always be true?
+                    log.debug("removing empty range");
+                    obsoleteRanges.add(range);
+                }
+            } else {
+                list.removeIf(annotation -> annotation.id().equals(removedAnnotation.id()));
+            }
+        });
+
+        // Delete any empty ranges post-iteration
+        for (Range range : obsoleteRanges) {
+            subMap.remove(range);
         }
     }
 
@@ -225,4 +261,16 @@ final class AnnotationManager {
             .toString();
     }
 
+    private void dumpState(String msg) {
+        log.trace("{}:", msg);
+        Map<Range<Long>, List<Annotation>> map = annotationsByElapsedTime.asMapOfRanges();
+        for (Range<Long> range : map.keySet()) {
+            log.trace("Range {} to {}", range.lowerEndpoint(), range.upperEndpoint());
+            List<Annotation> values = map.get(range);
+            for (Annotation value : values) {
+                log.trace(" {} \"{}\" {}-{}", value.id(), value.caption().get(), value.startTime(), value.endTime());
+            }
+        }
+        log.debug("No more ranges");
+    }
 }

@@ -26,9 +26,13 @@
     <logger name="org.mbari.cthulhu.app.NativeLogHandler" level="OFF">
         <appender-ref ref="STDOUT"/>
     </logger>
+
     <logger name="org.mbari.cthulu.ui.components.annotationview.AnnotationImageView" level="WARN" />
 
-    <root level="debug">
+<!--    <logger name="org.mbari.cthulhu.annotations.AnnotationController" level="DEBUG" />-->
+<!--    <logger name="org.mbari.cthulhu.annotations.AnnotationManager" level="DEBUG" />-->
+
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="FILE" />
     </root>

@@ -50,6 +50,7 @@
         <rxjava.version>3.0.0</rxjava.version>
         <slf4j.version>2.0.0-alpha1</slf4j.version>
         <vcr4j.version>4.3.2.jre11</vcr4j.version>
+        <!-- <vcr4j.version>4.4.0.jre11-SNAPSHOT</vcr4j.version> -->
         <vlcj.version>4.4.0</vlcj.version>
         <vlcjFileFilters.version>2.0.0</vlcjFileFilters.version>
 

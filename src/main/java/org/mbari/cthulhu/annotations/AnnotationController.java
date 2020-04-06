@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -244,7 +245,7 @@ final public class AnnotationController {
         return new Annotation(
             localization.getLocalizationUuid(),
             start,
-            start + localizationDuration(localization.getDuration().toMillis()),
+            start + localizationDuration(localization.getDuration()),
             new BoundingBox(
                 localization.getX(),
                 localization.getY(),
@@ -264,11 +265,19 @@ final public class AnnotationController {
      * <p>
      * If there is a valid duration, use it. Otherwise set a default duration equivalent to the configured annotation display iime window property.
      *
-     * @param toMillis
+     * @param duration
      * @return
      */
-    private long localizationDuration(long toMillis) {
-        return toMillis > 0 ? toMillis : application().settings().annotations().display().timeWindow() * 1000;
+    private long localizationDuration(Duration duration) {
+        int timeWindow = application().settings().annotations().display().timeWindow() * 1000;
+        if (duration == null) {
+            return timeWindow;
+        }
+        else {
+            long toMillis = duration.toMillis();
+            return toMillis > 0 ? toMillis : timeWindow;
+        }
+//        return toMillis > 0 ? toMillis : application().settings().annotations().display().timeWindow() * 1000;
     }
 
     private void updateAnnotationView(long newTime) {

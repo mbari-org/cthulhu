@@ -13,12 +13,12 @@
     <!--
         During development, keep a new timestamped log each time the application is run.
     -->
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+    <!-- <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>cthulhu-${timestamp}.log</file>
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%-30thread] %-5level %-40logger{40} | %msg%n</pattern>
         </encoder>
-    </appender>
+    </appender> -->
 
     <!--
         Category for log messages from the native (LibVLC) logger.
@@ -28,15 +28,14 @@
     </logger>
 
     <logger name="org.mbari.cthulhu.ui.components.annotationview.AnnotationImageView" level="WARN" />
-    <logger name="org.mbari.vcr4j.sharktopoda.client.udp.UdpIO" level="DEBUG" />
-    <logger name="org.mbari.cthulhu.app.CthulhuClientController" level="DEBUG" />
-
-    <!--    <logger name="org.mbari.cthulhu.annotations.AnnotationController" level="DEBUG" />-->
-    <!--    <logger name="org.mbari.cthulhu.annotations.AnnotationManager" level="DEBUG" />-->
+    <!-- <logger name="org.mbari.vcr4j.sharktopoda.client.udp.UdpIO" level="DEBUG" /> -->
+    <!-- <logger name="org.mbari.cthulhu.app.CthulhuClientController" level="DEBUG" /> -->
+    <!-- <logger name="org.mbari.cthulhu.annotations.AnnotationController" level="DEBUG" /> -->
+    <!-- <logger name="org.mbari.cthulhu.annotations.AnnotationManager" level="DEBUG" /> -->
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />
-<!--        <appender-ref ref="FILE" />-->
+        <!-- <appender-ref ref="FILE" />-->
     </root>
 
 </configuration>

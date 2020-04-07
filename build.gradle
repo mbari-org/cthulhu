@@ -138,7 +138,8 @@ jlink {
             installerType = "dmg"
             customInstallerOptions.addAll([
                     "--mac-package-name", "Cthulu",
-                    "--mac-package-identifier", project.name
+                    "--mac-package-identifier", project.name,
+                    "--icon", "src/main/resources/org/mbari/cthulhu/icons/app/cthulhu-icon.png"
             ])
         }
         installerOptions = customInstallerOptions

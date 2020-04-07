@@ -50,8 +50,8 @@ dependencies {
     implementation 'com.miglayout:miglayout-javafx:5.2'
     implementation 'info.picocli:picocli-shell-jline3:4.1.4'
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
-    implementation 'org.mbari.vcr4j:vcr4j-sharktopoda-client:4.4.0.jre11-SNAPSHOT'
-    implementation 'org.mbari.vcr4j:vcr4j-sharktopoda:4.3.2.jre11-SNAPSHOT'
+    implementation 'org.mbari.vcr4j:vcr4j-sharktopoda-client:4.3.2.jre11'
+    implementation 'org.mbari.vcr4j:vcr4j-sharktopoda:4.3.2.jre11'
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation 'uk.co.caprica:vlcj-file-filters:2.0.0'
     implementation 'uk.co.caprica:vlcj:4.4.0'
@@ -84,6 +84,7 @@ def runtimeJvmArgs = [
         '--add-reads', 'cthulhu.merged.module=javafx.base',
         '--add-reads', 'cthulhu.merged.module=javafx.controls',
         '--add-reads', 'cthulhu.merged.module=javafx.graphics',
+        '--add-reads', 'cthulhu.merged.module=org.slf4j',
 ]
 
 application {
@@ -137,15 +138,25 @@ jlink {
         else {
             installerType = "dmg"
             customInstallerOptions.addAll([
-                    "--mac-package-name", "Cthulu",
-                    "--mac-package-identifier", project.name,
-                    "--icon", "src/main/resources/org/mbari/cthulhu/icons/app/cthulhu-icon.png"
+                    "--mac-package-name", "Cthulhu",
+                    "--mac-package-identifier", project.name
+                    // "--icon", "src/main/resources/org/mbari/cthulhu/icons/app/cthulhu-icon.png"
             ])
         }
         installerOptions = customInstallerOptions
 
     }
 
+}
+
+tasks.jpackageImage.doLast {
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        copy {
+            from "src/jpackage/macos"
+            include "Cthulhu.icns"
+            into "build/jpackage/Cthulhu.app/Contents/Resources"
+        }
+    }
 }
 
 task tree(type: DependencyReportTask) {}

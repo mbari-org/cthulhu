@@ -269,13 +269,14 @@ final public class AnnotationController {
      * @return
      */
     private long localizationDuration(Duration duration) {
-        int timeWindow = application().settings().annotations().display().timeWindow() * 1000;
+
+        int timeWindowMillis = application().settings().annotations().display().timeWindow() * 1000;
         if (duration == null) {
-            return timeWindow;
+            return timeWindowMillis;
         }
         else {
             long toMillis = duration.toMillis();
-            return toMillis > 0 ? toMillis : timeWindow;
+            return toMillis > 0 ? toMillis : timeWindowMillis;
         }
 //        return toMillis > 0 ? toMillis : application().settings().annotations().display().timeWindow() * 1000;
     }

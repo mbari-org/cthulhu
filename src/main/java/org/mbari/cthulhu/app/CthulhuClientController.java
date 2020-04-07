@@ -14,6 +14,7 @@ import uk.co.caprica.vlcj.waiter.mediaplayer.SnapshotTakenWaiter;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -244,10 +245,22 @@ final class CthulhuClientController implements ClientController {
     private static File convertSnapshotPath(Path path) {
         log.debug("convertSnapshotPath(path={})",path);
         String snapshotPath = path.toString();
-        if (snapshotPath.startsWith(FILE_PREFIX)) {
-            snapshotPath = snapshotPath.substring(FILE_PREFIX.length());
+//        if (snapshotPath.startsWith(FILE_PREFIX)) {
+//            snapshotPath = snapshotPath.substring(FILE_PREFIX.length());
+//        }
+//        log.debug("snapshotPath={}", snapshotPath);
+//        return new File(snapshotPath);
+        try {
+            URL url = new URL(snapshotPath);
+            return new File(url.toURI());
         }
-        log.debug("snapshotPath={}", snapshotPath);
-        return new File(snapshotPath);
+        catch (MalformedURLException | URISyntaxException e){
+            log.error("Failed to resolve  = {}", path);
+            if (snapshotPath.startsWith(FILE_PREFIX)) {
+                snapshotPath = snapshotPath.substring(FILE_PREFIX.length());
+            }
+            log.debug("snapshotPath={}", snapshotPath);
+            return new File(snapshotPath);
+        }
     }
 }

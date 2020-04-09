@@ -87,6 +87,11 @@ def runtimeJvmArgs = [
         '--add-reads', 'cthulhu.merged.module=org.slf4j',
 ]
 
+if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+    runtimeJvmArgs.add("-DVLCJ_INITX=no")
+}
+
+
 application {
     mainClassName = "org.mbari.cthulhu/org.mbari.cthulhu.CthulhuLauncher"
     applicationDefaultJvmArgs = runtimeJvmArgs

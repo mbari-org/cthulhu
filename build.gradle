@@ -129,13 +129,19 @@ jlink {
         jpackageHome = System.getenv("JPACKAGE_HOME")
 
         def customInstallerOptions = [
+                "--app-version", project.version,
                 "--copyright", "Monterey Bay Aquarium Research Institute",
-                "--vendor", "org.mbari",
-                "--app-version", project.version
+                "--name", "Cthulhu",
+                "--vendor", "org.mbari"
         ]
 
         if  (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
             installerType = "deb"
+            customInstallerOptions.addAll([
+                "--linux-menu-group", "VARS",
+                "--linux-deb-maintainer", "bschlining@gmail.com",
+                "--linux-shortcut"
+            ])
         }
         else if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
             installerType = "msi"
@@ -155,7 +161,14 @@ jlink {
 }
 
 tasks.jpackageImage.doLast {
-    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+    if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+        copy {
+            from "src/jpackage/macos"
+            include "Cthulhu.png"
+            into "build/jpackage/Cthulhu/lib"
+        }
+    }
+    else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
         copy {
             from "src/jpackage/macos"
             include "Cthulhu.icns"

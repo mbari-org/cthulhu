@@ -34,12 +34,22 @@ Use Maven to build the application:
 $mvn clean install
 ```
 
+Or use gradle to build packages:
+```
+$gradlew clean jpackage --info
+```
+
 
 ## Running Cthulhu
 
 Using Maven:
 ```
 $mvn javafx:run
+```
+
+Using gradle:
+```
+$gradlew run
 ```
 
 ### Considerations if running on Linux

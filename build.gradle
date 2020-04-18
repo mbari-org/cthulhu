@@ -142,6 +142,7 @@ jlink {
                 "--linux-deb-maintainer", "bschlining@gmail.com",
                 "--linux-shortcut"
             ])
+            imageOptions = ["--icon", "src/jpackage/macos/Cthulhu.png"]
         }
         else if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
             installerType = "msi"
@@ -151,8 +152,8 @@ jlink {
             customInstallerOptions.addAll([
                     "--mac-package-name", "Cthulhu",
                     "--mac-package-identifier", project.name
-                    // "--icon", "src/main/resources/org/mbari/cthulhu/icons/app/cthulhu-icon.png"
             ])
+            imageOptions = ["--icon", "src/jpackage/macos/Cthulhu.icns"]
         }
         installerOptions = customInstallerOptions
 
@@ -160,22 +161,22 @@ jlink {
 
 }
 
-tasks.jpackageImage.doLast {
-    if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
-        copy {
-            from "src/jpackage/macos"
-            include "Cthulhu.png"
-            into "build/jpackage/Cthulhu/lib"
-        }
-    }
-    else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-        copy {
-            from "src/jpackage/macos"
-            include "Cthulhu.icns"
-            into "build/jpackage/Cthulhu.app/Contents/Resources"
-        }
-    }
-}
+// tasks.jpackageImage.doLast {
+//     if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
+//         copy {
+//             from "src/jpackage/macos"
+//             include "Cthulhu.png"
+//             into "build/jpackage/Cthulhu/lib"
+//         }
+//     }
+//     else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+//         copy {
+//             from "src/jpackage/macos"
+//             include "Cthulhu.icns"
+//             into "build/jpackage/Cthulhu.app/Contents/Resources"
+//         }
+//     }
+// }
 
 task tree(type: DependencyReportTask) {}
 

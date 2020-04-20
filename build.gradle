@@ -59,6 +59,8 @@ dependencies {
     runtimeOnly 'org.fusesource.jansi:jansi:1.18'
     testCompileOnly 'junit:junit:4.13'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
+    testImplementation 'info.picocli:picocli:4.2.0'
+    testImplementation 'info.picocli:picocli-shell-jline3:4.2.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.0'
 }

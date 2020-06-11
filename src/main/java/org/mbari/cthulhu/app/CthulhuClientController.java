@@ -92,7 +92,9 @@ final class CthulhuClientController implements ClientController {
         log.debug("pause(uuid={})", uuid);
         return application().playerComponents().get(uuid)
             .map(playerComponent -> {
-                playerComponent.mediaPlayer().controls().pause();
+                if (playerComponent.playing()) {
+                    playerComponent.mediaPlayer().controls().pause();
+                }
                 return true;
             }).orElse(false);
     }

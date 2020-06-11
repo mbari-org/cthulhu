@@ -37,7 +37,7 @@ test {
 }
 
 javafx {
-    version = 14
+    version = "14.0.1"
     modules = [
             'javafx.base',
             'javafx.controls',
@@ -162,23 +162,6 @@ jlink {
     }
 
 }
-
-// tasks.jpackageImage.doLast {
-//     if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
-//         copy {
-//             from "src/jpackage/macos"
-//             include "Cthulhu.png"
-//             into "build/jpackage/Cthulhu/lib"
-//         }
-//     }
-//     else if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-//         copy {
-//             from "src/jpackage/macos"
-//             include "Cthulhu.icns"
-//             into "build/jpackage/Cthulhu.app/Contents/Resources"
-//         }
-//     }
-// }
 
 task tree(type: DependencyReportTask) {}
 

@@ -26,6 +26,8 @@ repositories {
     mavenLocal()
 }
 
+
+
 test {
     useJUnitPlatform()
     moduleOptions {
@@ -46,32 +48,25 @@ javafx {
 }
 
 dependencies {
-    implementation 'com.google.guava:guava:28.2-jre'
+    implementation 'com.google.guava:guava:29.0-jre'
     implementation 'com.miglayout:miglayout-javafx:5.2'
-    implementation 'info.picocli:picocli-shell-jline3:4.1.4'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
-    implementation 'org.mbari.vcr4j:vcr4j-sharktopoda-client:4.3.2.jre11'
-    implementation 'org.mbari.vcr4j:vcr4j-sharktopoda:4.3.2.jre11'
+    implementation 'info.picocli:picocli-shell-jline3:4.3.2'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+    implementation 'org.mbari.vcr4j:vcr4j-sharktopoda-client:4.4.0.jre11'
+    implementation 'org.mbari.vcr4j:vcr4j-sharktopoda:4.4.0.jre11'
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation 'uk.co.caprica:vlcj-file-filters:2.0.0'
-    implementation 'uk.co.caprica:vlcj:4.4.0'
-    runtimeOnly 'ch.qos.logback:logback-classic:1.3.0-alpha4'
+    implementation 'uk.co.caprica:vlcj:4.5.2'
+    runtimeOnly 'ch.qos.logback:logback-classic:1.3.0-alpha4' // 1.3.0-alpha5 does not colorize
     runtimeOnly 'org.fusesource.jansi:jansi:1.18'
     testCompileOnly 'junit:junit:4.13'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testImplementation 'info.picocli:picocli:4.2.0'
-    testImplementation 'info.picocli:picocli-shell-jline3:4.2.0'
+    testImplementation 'info.picocli:picocli:4.3.2'
+    // testImplementation 'info.picocli:picocli-shell-jline3:4.2.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
     testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.0'
 }
 
-tasks.withType(JavaExec) {
-    if (System.getProperty('DEBUG', 'false') == 'true') {
-        def debugJvmArgs = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005']
-        debugJvmArgs.addAll(runtimeJvmArgs)
-        jvmArgs(debugJvmArgs)
-    }
-}
 
 /* *****************************************************************************
  Use the jlink plugin to build a dist with a JVM
@@ -91,6 +86,14 @@ def runtimeJvmArgs = [
 
 if (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
     runtimeJvmArgs.add("-DVLCJ_INITX=no")
+}
+
+tasks.withType(JavaExec) {
+    if (System.getProperty('DEBUG', 'false') == 'true') {
+        def debugJvmArgs = ['-Xdebug', '-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005']
+        debugJvmArgs.addAll(runtimeJvmArgs)
+        jvmArgs(debugJvmArgs)
+    }
 }
 
 

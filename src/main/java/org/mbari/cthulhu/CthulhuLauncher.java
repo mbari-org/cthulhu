@@ -57,6 +57,10 @@ public class CthulhuLauncher extends Application {
      * @param args command-line arguments
      */
     public static void main(String[] args) {
+        if (args != null && args.length > 0) {
+            var msg = String.join(" ", args);
+            log.info("Starting with args: {}", msg);
+        }
         launch(args);
     }
 

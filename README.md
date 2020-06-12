@@ -3,7 +3,7 @@
 # Cthulhu
 
 Cthulhu is a video playback and annotation application developed by the
-[Monteray Bay Aquarium Research Institute](https://mbari.org).
+[Monterey Bay Aquarium Research Institute](https://mbari.org).
 
  This player has been tested on macOS and Linux. You will need to install the [VLC media player](https://www.videolan.org/vlc) as Cthulhu uses [libvlc](https://wiki.videolan.org/LibVLC/) for video decoding. Note that [snap installs of VLC](https://snapcraft.io/) appear not to work with Cthulhu.
 

@@ -160,20 +160,39 @@ jlink {
             ])
             imageOptions = ["--icon", "src/jpackage/macos/Cthulhu.icns"]
 
-            def prefix = System.getenv("MAC_PACKAGE_SIGNING_PREFIX")
-            def user=System.getenv("MAC_SIGNING_KEY_USER_NAME")
-            if (prefix && user) {
-                customInstallerOptions.addAll([
-                    "--mac-sign",
-                    "--mac-package-signing-prefix", prefix,
-                    "--mac-signing-key-user-name", user
-                ])
-            }
+            // def prefix = System.getenv("MAC_PACKAGE_SIGNING_PREFIX")
+            // def user=System.getenv("MAC_SIGNING_KEY_USER_NAME")
+            // if (prefix && user) {
+            //     customInstallerOptions.addAll([
+            //         "--mac-sign",
+            //         "--mac-package-signing-prefix", prefix,
+            //         "--mac-signing-key-user-name", user
+            //     ])
+            // }
         }
         installerOptions = customInstallerOptions
 
     }
 
+}
+
+
+tasks.jpackageImage.doLast {
+    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+        def signer = System.getenv("MAC_CODE_SIGNER")
+        if (signer) {
+            exec {
+                println("MACOSX: Signing application")
+                workingDir "build/jpackage"
+
+                executable "codesign"
+
+                args "--entitlements", "${projectDir}/src/jpackage/macos/java.entitlements",
+                  "--options", "runtime", "--deep", "-vvv", "-f", "--sign", signer, 
+                  "Cthulhu.app"
+            }
+        }
+    }
 }
 
 task tree(type: DependencyReportTask) {}

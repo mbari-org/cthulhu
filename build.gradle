@@ -39,7 +39,7 @@ test {
 }
 
 javafx {
-    version = "14.0.1"
+    version = "15.0.1"
     modules = [
             'javafx.base',
             'javafx.controls',
@@ -48,23 +48,23 @@ javafx {
 }
 
 dependencies {
-    implementation 'com.google.guava:guava:29.0-jre'
+    implementation 'com.google.guava:guava:30.1-jre'
     implementation 'com.miglayout:miglayout-javafx:5.2'
     implementation 'info.picocli:picocli-shell-jline3:4.3.2'
-    implementation 'io.reactivex.rxjava3:rxjava:3.0.4'
+    implementation 'io.reactivex.rxjava3:rxjava:3.0.10'
     implementation 'org.mbari.vcr4j:vcr4j-sharktopoda-client:4.4.0.jre11'
     implementation 'org.mbari.vcr4j:vcr4j-sharktopoda:4.4.0.jre11'
     implementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
     implementation 'uk.co.caprica:vlcj-file-filters:2.0.0'
-    implementation 'uk.co.caprica:vlcj:4.5.2'
+    implementation 'uk.co.caprica:vlcj:4.7.0'
     runtimeOnly 'ch.qos.logback:logback-classic:1.3.0-alpha4' // 1.3.0-alpha5 does not colorize
-    runtimeOnly 'org.fusesource.jansi:jansi:1.18'
-    testCompileOnly 'junit:junit:4.13'
+    runtimeOnly 'org.fusesource.jansi:jansi:2.2.0'
+    testCompileOnly 'junit:junit:4.13.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testImplementation 'info.picocli:picocli:4.3.2'
-    testImplementation 'info.picocli:picocli-shell-jline3:4.3.2'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.6.0'
-    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.6.0'
+    testImplementation 'info.picocli:picocli:4.6.1'
+    testImplementation 'info.picocli:picocli-shell-jline3:4.6.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.1'
+    testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.7.1'
 }
 
 
@@ -98,7 +98,8 @@ tasks.withType(JavaExec) {
 
 
 application {
-    mainClassName = "org.mbari.cthulhu/org.mbari.cthulhu.CthulhuLauncher"
+//    mainClassName = "org.mbari.cthulhu/org.mbari.cthulhu.CthulhuLauncher"
+    mainClassName = "org.mbari.cthulhu.CthulhuLauncher"
     applicationDefaultJvmArgs = runtimeJvmArgs
 }
 

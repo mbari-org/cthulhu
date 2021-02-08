@@ -22,7 +22,7 @@ final public class State {
         this.windowY = 300;
         this.windowWidth = 1100;
         this.windowHeight = 770;
-        this.openDialogDirectory = ".";
+        this.openDialogDirectory = System.getProperty("user.home");
     }
 
     public State(State from) {

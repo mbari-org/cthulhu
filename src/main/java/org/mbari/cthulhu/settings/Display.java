@@ -24,7 +24,7 @@ final public class Display {
     public Display() {
         this.borderSize = 6;
         this.borderColour = colorToWebString(Color.ANTIQUEWHITE);
-        this.timeWindow = 2;
+        this.timeWindow = 2000;
         this.decayBorderColour = colorToWebString(Color.color(1.0d, 1.0d, 1.0d, 0.0d));
     }
 

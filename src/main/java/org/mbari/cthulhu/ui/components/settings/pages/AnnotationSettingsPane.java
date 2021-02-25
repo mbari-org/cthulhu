@@ -113,7 +113,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
         displayPane.add(timeWindowTextField);
         displayPane.add(new ItemLabel("Decay Colour:"), "width 100::");
         displayPane.add(decayBorderColourPicker);
-        displayPane.add(new HelpTextLabel("seconds"), "skip, span 3");
+        displayPane.add(new HelpTextLabel("millis"), "skip, span 3");
 
         contentPane.add(displayPane);
 

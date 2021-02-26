@@ -152,7 +152,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
         dragBorderColourPicker.setValue(Color.web(settings.annotations().creation().borderColour()));
         displayBorderSizeTextField.setText(Integer.toString(settings.annotations().display().borderSize()));
         displayBorderColourPicker.setValue(Color.web(settings.annotations().display().borderColour()));
-        timeWindowTextField.setText(Integer.toString(settings.annotations().display().timeWindow()));
+        timeWindowTextField.setText(Integer.toString(settings.annotations().display().timeWindowMillis()));
         decayBorderColourPicker.setValue(Color.web(settings.annotations().display().decayBorderColour()));
         selectionBorderSizeTextField.setText(Integer.toString(settings.annotations().selection().borderSize()));
         selectionBorderColourPicker.setValue(Color.web(settings.annotations().selection().borderColour()));
@@ -172,7 +172,7 @@ final public class AnnotationSettingsPane extends SettingsPage {
         settings.annotations().creation().borderColour(colorToWebString(dragBorderColourPicker.getValue()));
         settings.annotations().display().borderSize(parseInt(displayBorderSizeTextField.getText()));
         settings.annotations().display().borderColour(colorToWebString(displayBorderColourPicker.getValue()));
-        settings.annotations().display().timeWindow(parseInt(timeWindowTextField.getText()));
+        settings.annotations().display().timeWindowMillis(parseInt(timeWindowTextField.getText()));
         settings.annotations().display().decayBorderColour(colorToWebString(decayBorderColourPicker.getValue()));
         settings.annotations().selection().borderSize(parseInt(selectionBorderSizeTextField.getText()));
         settings.annotations().selection().borderColour(colorToWebString(selectionBorderColourPicker.getValue()));

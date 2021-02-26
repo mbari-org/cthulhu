@@ -14,7 +14,7 @@ final public class Display {
 
     private String borderColour;
 
-    private int timeWindow;
+    private int timeWindowMillis;
 
     private String decayBorderColour;
 
@@ -24,7 +24,7 @@ final public class Display {
     public Display() {
         this.borderSize = 6;
         this.borderColour = colorToWebString(Color.ANTIQUEWHITE);
-        this.timeWindow = 2000;
+        this.timeWindowMillis = 2000;
         this.decayBorderColour = colorToWebString(Color.color(1.0d, 1.0d, 1.0d, 0.0d));
     }
 
@@ -36,7 +36,7 @@ final public class Display {
     public Display(Display from) {
         this.borderSize = from.borderSize;
         this.borderColour = from.borderColour;
-        this.timeWindow = from.timeWindow;
+        this.timeWindowMillis = from.timeWindowMillis;
         this.decayBorderColour = from.decayBorderColour;
     }
 
@@ -56,12 +56,12 @@ final public class Display {
         this.borderColour = borderColour;
     }
 
-    public int timeWindow() {
-        return timeWindow;
+    public int timeWindowMillis() {
+        return timeWindowMillis;
     }
 
-    public void timeWindow(int timeWindow) {
-        this.timeWindow = timeWindow;
+    public void timeWindowMillis(int timeWindowMillis) {
+        this.timeWindowMillis = timeWindowMillis;
     }
 
     public String decayBorderColour() {
@@ -77,7 +77,7 @@ final public class Display {
         return toStringHelper(this)
             .add("borderSize", borderSize)
             .add("borderColour", borderColour)
-            .add("timeWindow", timeWindow)
+            .add("timeWindowMillis", timeWindowMillis)
             .add("decayBorderColour", decayBorderColour)
             .toString();
     }

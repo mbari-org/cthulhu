@@ -250,7 +250,7 @@ final class AnnotationManager {
     }
 
     private Range<Long> range(Annotation annotation) {
-        int timeWindow = application().settings().annotations().display().timeWindow();
+        int timeWindow = application().settings().annotations().display().timeWindowMillis();
         return Range.closed(annotation.startTime() - timeWindow, annotation.endTime() + timeWindow);
     }
 

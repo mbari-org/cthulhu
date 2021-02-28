@@ -175,6 +175,12 @@ final class AnnotationManager {
      */
     private void add(Annotation addedAnnotation) {
         log.debug("add(addedAnnotation={})", addedAnnotation);
+        
+        // #4 TODO this may be removed -- just to facilitate following the code for now
+        if (addedAnnotation.startTime() >= addedAnnotation.endTime()) {
+            log.warn("addedAnnotation startTime={} >= endTime={}", addedAnnotation.startTime(), addedAnnotation.endTime());
+        }
+        
         annotationsByUuid.put(addedAnnotation.id(), addedAnnotation);
         Range<Long> range = range(addedAnnotation);
         // Most of the time this will create a lightweight singleton list wrapper, it is only the unlikely case that an annotation has the exact same start and

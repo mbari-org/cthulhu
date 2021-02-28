@@ -26,8 +26,9 @@ final class MediaPlayerTimer {
     /**
      * The ideal update period of one second can sometimes  cause whole seconds to be missed, so a shorter period is
      * used.
+     * #4: was 500ms, but we should use a smaller period -- see more comments below.
      */
-    private static final long PERIOD = 500;
+    private static final long PERIOD = 100;
 
     /**
      * Timer implementation.
@@ -35,31 +36,41 @@ final class MediaPlayerTimer {
     private Timer timer = new Timer(true);
 
     /**
-     * Previous whole seconds value.
+     * Value used in previous call to onTick.accept.
+     * #4 trying finer resolution
      */
-    private long previousSeconds = -1;
+    private long previousMillis = -1;
 
     /**
      * Create a timer.
      *
      * @param mediaPlayer media player that generates time-changed events
-     * @param onTick function to execute on each per-second tick of the timer
+     * @param onTick function to execute on each tick of the timer depending of time of previous call
      */
     MediaPlayerTimer(MediaPlayer mediaPlayer, Consumer<Long> onTick) {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
                 if (mediaPlayer.status().isPlaying()) {
-                    long newTime = mediaPlayer.status().time();
-                    // There are a number of strategies that could be used such as flooring rather than rounding,
-                    // however empirically the approach here seems to give the best UX
-                    long newSeconds = Math.round((double) newTime / 1000);
-                    // Only send a new event if the whole-second value has changed since the last event
-                    if (newSeconds != previousSeconds) {
-                        previousSeconds = newSeconds;
-                        log.trace("onTick(newSeconds={})", newSeconds);
-                        onTick.accept(newSeconds * 1000);
+                    // #4: finer resolution to notify tick:
+                    final long newMillis = mediaPlayer.status().time();
+                    if (newMillis != previousMillis) {
+                        log.debug("onTick(newMillis={}, diff={})", newMillis, newMillis - previousMillis);
+                        previousMillis = newMillis;
+                        onTick.accept(newMillis);
                     }
+                    // Note: even with timer period 100ms, delta changes in reported mediaPlayer.status().time()
+                    // are often in the order of 400-500ms, and sometimes ~250ms, but one would expect it to be
+                    // also in the order of the timer period while the media is playing.
+                    //  ... onTick(newMillis=15405, diff=500)
+                    //  ... onTick(newMillis=15904, diff=499)
+                    //  ... onTick(newMillis=16155, diff=251)
+                    //  ... onTick(newMillis=16655, diff=500)
+                    //  ... onTick(newMillis=17155, diff=500)
+                    //  ... onTick(newMillis=17652, diff=497)
+                    //  ... onTick(newMillis=17902, diff=250)
+                    //  ... onTick(newMillis=18403, diff=501)
+                    // In there a way to instruct libvlc to use a finer resolution for the time status above?
                 }
             }
         }, 0, PERIOD);

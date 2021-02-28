@@ -91,7 +91,7 @@ final public class AnnotationController {
     }
 
     private void handleTimeChanged(long newTime) {
-        log.trace("handleTimeChanged(newTime={})", newTime);
+        log.trace("handleTimeChanged(newTime={}, diff={})", newTime, newTime - lastTime);
         lastTime = newTime;
         updateAnnotationView(newTime);
     }

@@ -1,6 +1,6 @@
 module org.mbari.cthulhu {
     exports org.mbari.cthulhu to javafx.graphics;
-    exports org.mbari.cthulhu.settings to com.google.gson;
+   exports org.mbari.cthulhu.settings to com.google.gson;
 
     requires com.google.gson;
     requires com.google.common;
@@ -14,4 +14,5 @@ module org.mbari.cthulhu {
     requires vcr4j.sharktopoda.client;
 
     opens org.mbari.cthulhu.app.config;
+    opens org.mbari.cthulhu.settings;
 }

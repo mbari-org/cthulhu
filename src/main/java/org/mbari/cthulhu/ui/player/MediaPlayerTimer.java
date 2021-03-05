@@ -36,10 +36,20 @@ final class MediaPlayerTimer {
     private Timer timer = new Timer(true);
 
     /**
-     * Value used in previous call to onTick.accept.
-     * #4 trying finer resolution
+     * Captures previously reported mediaPlayer.status().time()
      */
-    private long previousMillis = -1;
+    private long previousMpMillis = -1;
+    
+    /**
+     * Captures system time when previousMpMillis is updated.
+     */
+    private long previousSysMillis = 0;
+
+    /**
+     * This is either +1 or -1 indicating time direction according to sign of
+     * reported mediaPlayer time difference.
+     */
+    private long timeDirection;
 
     /**
      * Create a timer.
@@ -52,25 +62,29 @@ final class MediaPlayerTimer {
             @Override
             public void run() {
                 if (mediaPlayer.status().isPlaying()) {
-                    // #4: finer resolution to notify tick:
-                    final long newMillis = mediaPlayer.status().time();
-                    if (newMillis != previousMillis) {
-                        log.debug("onTick(newMillis={}, diff={})", newMillis, newMillis - previousMillis);
-                        previousMillis = newMillis;
-                        onTick.accept(newMillis);
+                    final long newMpMillis = mediaPlayer.status().time();
+                    
+                    // to value to use for onTick.accept
+                    long toCallTickMillis;
+    
+                    if (newMpMillis != previousMpMillis) {
+                        // mediaPlayer has reported a new value.
+                        timeDirection = newMpMillis >= previousMpMillis ? +1 : -1;
+                        toCallTickMillis = previousMpMillis = newMpMillis;
+                        previousSysMillis = System.currentTimeMillis();
                     }
-                    // Note: even with timer period 100ms, delta changes in reported mediaPlayer.status().time()
-                    // are often in the order of 400-500ms, and sometimes ~250ms, but one would expect it to be
-                    // also in the order of the timer period while the media is playing.
-                    //  ... onTick(newMillis=15405, diff=500)
-                    //  ... onTick(newMillis=15904, diff=499)
-                    //  ... onTick(newMillis=16155, diff=251)
-                    //  ... onTick(newMillis=16655, diff=500)
-                    //  ... onTick(newMillis=17155, diff=500)
-                    //  ... onTick(newMillis=17652, diff=497)
-                    //  ... onTick(newMillis=17902, diff=250)
-                    //  ... onTick(newMillis=18403, diff=501)
-                    // In there a way to instruct libvlc to use a finer resolution for the time status above?
+                    else {
+                        // mediaPlayer has reported the same value as before.
+                        // Let's use last known time direction and system time difference for the onTick call:
+                        toCallTickMillis = previousMpMillis +
+                            timeDirection * (System.currentTimeMillis() - previousSysMillis);
+                    }
+                    
+                    log.trace("onTick: toCallTickMillis={}  timeDirection={}", toCallTickMillis, timeDirection);
+                    onTick.accept(toCallTickMillis);
+                }
+                else {
+                    previousMpMillis = -1;
                 }
             }
         }, 0, PERIOD);

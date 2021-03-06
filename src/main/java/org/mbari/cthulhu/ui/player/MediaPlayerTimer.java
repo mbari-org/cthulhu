@@ -12,7 +12,7 @@ import java.util.function.Consumer;
  * A more stable source of time events for a media player.
  * <p>
  * The native media player sends somewhat irregular time changes which if strictly adhered to will provide a less than
- * optimal user experience, this component attempts to provide a more stable timer aiming to give smooth per-second
+ * optimal user experience, this component attempts to provide a more stable timer aiming to give smooth
  * updates for timer displays.
  * <p>
  * The accuracy and other characteristics of the time events from the native media player depend on the decoder that is
@@ -23,10 +23,18 @@ final class MediaPlayerTimer {
 
     private static final Logger log = LoggerFactory.getLogger(MediaPlayerTimer.class);
 
+    //  - While playing, this timer calls the given handler at every tick
+    //  - The handler is called with the following time value depending on whether
+    //    mediaPlayer.status().time() has reported a new time or not:
+    //      - if the reported time is new, then that's the one used for the call
+    //      - otherwise, the time is the previously reported time plus the difference in
+    //        system time wrt when that last time was reported.
+    //        This also takes into account the "direction of time" based on reported
+    //        mediaPlayer.status().time() values, which should help better reflect the
+    //        changes when the user drags the time control back and forth during playing.
+    
     /**
-     * The ideal update period of one second can sometimes  cause whole seconds to be missed, so a shorter period is
-     * used.
-     * #4: was 500ms, but we should use a smaller period -- see more comments below.
+     * A short period for this timer. At each tick, the given onTick consumer is called.
      */
     private static final long PERIOD = 100;
 
@@ -64,7 +72,7 @@ final class MediaPlayerTimer {
                 if (mediaPlayer.status().isPlaying()) {
                     final long newMpMillis = mediaPlayer.status().time();
                     
-                    // to value to use for onTick.accept
+                    // the value to use for onTick.accept
                     long toCallTickMillis;
     
                     if (newMpMillis != previousMpMillis) {

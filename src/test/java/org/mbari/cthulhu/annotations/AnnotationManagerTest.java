@@ -22,7 +22,7 @@ public class AnnotationManagerTest {
 
     @BeforeAll
     public static void prepare() {
-        application().settings().annotations().display().timeWindow(0);
+        application().settings().annotations().display().timeWindowMillis(0);
     }
 
     @BeforeEach

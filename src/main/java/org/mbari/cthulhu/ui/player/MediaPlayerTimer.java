@@ -63,7 +63,7 @@ final class MediaPlayerTimer {
      * Create a timer.
      *
      * @param mediaPlayer media player that generates time-changed events
-     * @param onTick function to execute on each tick of the timer depending of time of previous call
+     * @param onTick function to execute on each tick of the timer
      */
     MediaPlayerTimer(MediaPlayer mediaPlayer, Consumer<Long> onTick) {
         timer.scheduleAtFixedRate(new TimerTask() {

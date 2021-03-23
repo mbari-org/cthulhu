@@ -1,12 +1,15 @@
 package org.mbari.cthulhu.ui.components.annotationview;
 
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
+import javafx.scene.Cursor;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import org.mbari.cthulhu.model.Annotation;
 import org.mbari.cthulhu.settings.Settings;
@@ -26,8 +29,7 @@ import java.util.function.Consumer;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mbari.cthulhu.app.CthulhuApplication.application;
-import static org.mbari.cthulhu.ui.components.annotationview.ResourceFactory.createCursorRectangle;
-import static org.mbari.cthulhu.ui.components.annotationview.ResourceFactory.createDragRectangle;
+import static org.mbari.cthulhu.ui.components.annotationview.ResourceFactory.*;
 
 /**
  * A component that provides an interactive overlay for creating video annotations.
@@ -46,8 +48,10 @@ public class AnnotationImageView extends ResizableImageView {
 
     private final Rectangle cursorRectangle = createCursorRectangle();
 
-    private final Rectangle dragRectangle = createDragRectangle();
-
+   // private final Rectangle dragRectangle = createDragRectangle();
+    private Rectangle dragRectangle = null;
+    // not sure if i need this line
+    private final Rectangle annotationRectangle = createAnnotationRectangle();
     private final PlayerComponent playerComponent;
 
     /**
@@ -84,8 +88,8 @@ public class AnnotationImageView extends ResizableImageView {
         super(playerComponent.videoImageView());
 
         this.playerComponent = playerComponent;
-
-        getChildren().addAll(cursorRectangle, dragRectangle);
+        dragRectangle = createDragRectangle();
+        getChildren().addAll(cursorRectangle, dragRectangle, annotationRectangle);
 
         registerEventHandlers();
     }
@@ -97,6 +101,12 @@ public class AnnotationImageView extends ResizableImageView {
         imageView.setOnMousePressed(this::mousePressed);
         imageView.setOnMouseDragged(this::mouseDragged);
         imageView.setOnMouseReleased(this::mouseReleased);
+
+
+//        enableDrag();
+
+        makeDraggable(dragRectangle,annotationRectangle);
+        //makeDraggable(annotationRectangle);
 
         setOnKeyPressed(this::keyPressed);
 
@@ -116,6 +126,7 @@ public class AnnotationImageView extends ResizableImageView {
         cursorRectangle.setY(event.getY());
     }
 
+
     private void mousePressed(MouseEvent event) {
         requestFocus();
 
@@ -129,7 +140,104 @@ public class AnnotationImageView extends ResizableImageView {
         dragRectangle.setWidth(0);
         dragRectangle.setHeight(0);
         dragRectangle.setVisible(true);
-    };
+    }
+
+    // make a targetNode movable by dragging it around with the mouse.
+    static void makeDraggable(Rectangle node, Rectangle curosor) {
+
+        curosor.xProperty().bind(node.xProperty());
+        curosor.yProperty().bind(node.yProperty());
+        final Delta dragDelta = new Delta();
+        curosor.setOnMouseDragged(me -> {
+            double oldX = node.getX();
+            double oldY = node.getY();
+
+
+            node.setX(me.getX() - dragDelta.x);
+            node.setY(me.getY() - dragDelta.y);
+            node.setWidth(node.getWidth() - dragDelta.x);
+            node.setHeight(node.getHeight() - dragDelta.y);
+
+            double newX = node.getX();
+            double newY = node.getY();
+        });
+
+
+
+        node.setOnMouseEntered(me -> {
+            if (!me.isPrimaryButtonDown()) {
+                node.getScene().setCursor(Cursor.HAND);
+            }
+        });
+        node.setOnMouseExited(me -> {
+            if (!me.isPrimaryButtonDown()) {
+                node.getScene().setCursor(Cursor.DEFAULT);
+            }
+        });
+        node.setOnMousePressed(me -> {
+            if (me.isPrimaryButtonDown()) {
+                node.getScene().setCursor(Cursor.DEFAULT);
+            }
+            dragDelta.x = me.getX() - node.getX();
+            dragDelta.y = me.getY() - node.getY();
+            node.getScene().setCursor(Cursor.MOVE);
+        });
+        node.setOnMouseReleased(me -> {
+            if (!me.isPrimaryButtonDown()) {
+                node.getScene().setCursor(Cursor.DEFAULT);
+            }
+        });
+        node.setOnMouseDragged(me -> {
+            double oldX = node.getX();
+            double oldY = node.getY();
+
+
+            node.setX(me.getX() - dragDelta.x);
+            node.setY(me.getY() - dragDelta.y);
+
+            double newX = node.getX();
+            double newY = node.getY();
+        });
+    }
+
+    static class Delta { double x, y; }
+    // make a node movable by dragging it around with the mouse.
+    private void enableDrag( Circle circle) {
+        final Delta dragDelta = new Delta();
+        dragRectangle.setOnMousePressed(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent mouseEvent) {
+                // record a delta distance for the drag and drop operation.
+                dragDelta.x = circle.getCenterX() - mouseEvent.getX();
+                dragDelta.y = circle.getCenterY() - mouseEvent.getY();
+                circle.getScene().setCursor(Cursor.MOVE);
+            }
+        });
+        dragRectangle.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent mouseEvent) {
+                circle.getScene().setCursor(Cursor.HAND);
+            }
+        });
+        dragRectangle.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent mouseEvent) {
+                circle.setCenterX(mouseEvent.getX() + dragDelta.x);
+                circle.setCenterY(mouseEvent.getY() + dragDelta.y);
+            }
+        });
+        dragRectangle.setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent mouseEvent) {
+                if (!mouseEvent.isPrimaryButtonDown()) {
+                    circle.getScene().setCursor(Cursor.HAND);
+                }
+            }
+        });
+        dragRectangle.setOnMouseExited(new EventHandler<MouseEvent>() {
+            @Override public void handle(MouseEvent mouseEvent) {
+                if (!mouseEvent.isPrimaryButtonDown()) {
+                    circle.getScene().setCursor(Cursor.DEFAULT);
+                }
+            }
+        });
+    }
 
     private void mouseDragged(MouseEvent event) {
         if (anchorX == -1) {
@@ -165,14 +273,15 @@ public class AnnotationImageView extends ResizableImageView {
             return;
         }
 
-        dragRectangle.setVisible(false);
+        //dragRectangle.setVisible(false);
         if (dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
-            newAnnotation();
+            //newAnnotation();
         }
 
         mousePressedTime = -1L;
         anchorX = anchorY = -1d;
     }
+
 
     private void keyPressed(KeyEvent event) {
         if (dragRectangle.isVisible() && CANCEL_DRAG_KEY_CODE == event.getCode()) {

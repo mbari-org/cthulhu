@@ -15,11 +15,12 @@ import static org.mbari.cthulhu.app.CthulhuApplication.application;
 /**
  * JavaFX application launcher for the Cthulu application.
  */
-public class CthulhuLauncher extends Application {
+public class
+CthulhuLauncher extends Application {
 
     private static final Logger log = LoggerFactory.getLogger(CthulhuLauncher.class);
 
-    /**
+    /*
      * Emit the application banner to the log immediately on startup.
      */
     static {

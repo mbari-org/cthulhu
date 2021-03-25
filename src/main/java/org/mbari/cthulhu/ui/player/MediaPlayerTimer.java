@@ -85,22 +85,20 @@ final class MediaPlayerTimer {
                 if (mediaPlayer.status().isPlaying()) {
                     wasPlaying = true;
                     
-                    final long currSysMillis = System.currentTimeMillis();
-                    
                     // the value to use for onTick.accept
                     long toCallTickMillis;
 
                     if (newMpMillis != previousMpMillis) {
                         // mediaPlayer has reported a new value.
-                        timeDirection = newMpMillis >= previousMpMillis ? +1 : -1;
+                        timeDirection = newMpMillis > previousMpMillis ? +1 : -1;
                         toCallTickMillis = previousMpMillis = newMpMillis;
-                        previousSysMillisForMp = currSysMillis;
+                        previousSysMillisForMp = System.currentTimeMillis();
                     }
                     else {
                         // mediaPlayer has reported the same value as before.
                         // Let's use last known time direction and system time difference for the onTick call:
                         toCallTickMillis = previousMpMillis +
-                            timeDirection * (currSysMillis - previousSysMillisForMp);
+                            timeDirection * (System.currentTimeMillis() - previousSysMillisForMp);
                     }
                     
                     /*

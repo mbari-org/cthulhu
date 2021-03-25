@@ -103,6 +103,7 @@ final class MediaPlayerTimer {
                             timeDirection * (currSysMillis - previousSysMillisForMp);
                     }
                     
+                    /*
                     if (log.isTraceEnabled()) {
                         final long sysDiffMillis = currSysMillis - previousSysMillis;
                         previousSysMillis = currSysMillis;
@@ -110,6 +111,7 @@ final class MediaPlayerTimer {
                             toCallTickMillis, newMpMillis, timeDirection, sysDiffMillis
                         );
                     }
+                    */
 
                     onTick.accept(toCallTickMillis);
                 }
@@ -119,7 +121,7 @@ final class MediaPlayerTimer {
                         // Media just paused. Let's do one more call to the handler indicating
                         // the time reported by the media player:
                         wasPlaying = false;
-                        log.trace("onTick: media just paused. Calling handler with newMpMillis={}", newMpMillis);
+                        //log.trace("onTick: media just paused. Calling handler with newMpMillis={}", newMpMillis);
                         onTick.accept(newMpMillis);
                     }
                 }

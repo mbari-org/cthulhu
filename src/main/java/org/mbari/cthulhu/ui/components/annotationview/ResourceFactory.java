@@ -1,8 +1,19 @@
 package org.mbari.cthulhu.ui.components.annotationview;
 
+import javafx.application.Application;
+import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
+import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
+import javafx.stage.Stage;
+
+import java.util.Arrays;
 
 import static org.mbari.cthulhu.app.CthulhuApplication.application;
 
@@ -37,7 +48,9 @@ final class ResourceFactory {
     static Rectangle createDragRectangle() {
         Rectangle rectangle = new Rectangle(0, 0, 0, 0);
         rectangle.setFill(null);
-        rectangle.setStroke(Color.web(application().settings().annotations().creation().borderColour()));
+//        rectangle.setStroke(Color.ORANGE);
+        //rectangle.setStroke(Color.web(application().settings().annotations().creation().borderColour()));
+        rectangle.setStroke(Color.BLUE);
         rectangle.setStrokeWidth(application().settings().annotations().creation().borderSize());
         rectangle.setStrokeType(STROKE_TYPE);
         rectangle.setManaged(false);
@@ -58,7 +71,8 @@ final class ResourceFactory {
     static Rectangle createAnnotationRectangle() {
         Rectangle rectangle = new Rectangle(0, 0, 0, 0);
         rectangle.setFill(null);
-        rectangle.setStroke(Color.web(application().settings().annotations().display().borderColour()));
+        //rectangle.setStroke(Color.web(application().settings().annotations().display().borderColour()));
+        rectangle.setStroke(Color.RED);
         rectangle.setStrokeWidth(application().settings().annotations().display().borderSize());
         rectangle.setStrokeType(STROKE_TYPE);
         rectangle.setManaged(false);
@@ -66,6 +80,33 @@ final class ResourceFactory {
         return rectangle;
     }
 
+
     private ResourceFactory() {
     }
+
+//    static class Delta { double x, y; }
+//
+//    Rectangle enableDrag(final Rectangle rect){
+//        Rectangle rectangle = new Rectangle(0, 0, 0, 0);
+//        final Delta dragDelta = new Delta();
+//
+//        rect.setOnMousePressed(new EventHandler<MouseEvent>() {
+//            @Override
+//            public void handle(MouseEvent mouseEvent) {
+//
+////                double offsetX = t.getSceneX() - getX();
+////                double offsetY = t.getSceneY() - getY();
+//            dragDelta.x = rect.getSceneX() - mouseEvent.getX();
+//            dragDelta.y = rect.getY() - mouseEvent.getY();
+//            rect.setCursor(Cursor.MOVE);
+//            }
+//        });
+//
+//
+//        return rectangle;
+//    }
+
+
+
+
 }

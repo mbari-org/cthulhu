@@ -6,7 +6,7 @@
         <withJansi>true</withJansi>
         <encoder>
             <!-- <pattern>%d{HH:mm:ss.SSS} [%-30thread] %-5level %-40logger{40} | %msg%n</pattern> -->
-            <pattern>%gray(%d{HH:mm:ss.SSS}) [%green(%-30thread)] %highlight(%-5level) %blue(%-40logger{40}) %gray(|) %msg%n</pattern>
+            <pattern>%gray(%d{HH:mm:ss.SSS}) [%green(%-25thread)] %highlight(%-5level) %blue(%-40logger{40}) %gray(|) %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -29,9 +29,13 @@
 
     <logger name="org.mbari.cthulhu.ui.components.annotationview.AnnotationImageView" level="WARN" />
     <!-- <logger name="org.mbari.vcr4j.sharktopoda.client.udp.UdpIO" level="DEBUG" /> -->
-    <!-- <logger name="org.mbari.cthulhu.app.CthulhuClientController" level="DEBUG" /> -->
-    <!-- <logger name="org.mbari.cthulhu.annotations.AnnotationController" level="DEBUG" /> -->
-    <!-- <logger name="org.mbari.cthulhu.annotations.AnnotationManager" level="DEBUG" /> -->
+     <logger name="org.mbari.cthulhu.app.CthulhuClientController" level="WARN" />
+     <logger name="org.mbari.cthulhu.app.PlayerComponents" level="WARN" />
+     <logger name="org.mbari.cthulhu.ui.player.PlayerComponent" level="WARN" />
+     <logger name="org.mbari.cthulhu.ui.player.PlayerComponentStage" level="WARN" />
+     <logger name="org.mbari.vcr4j.sharktopoda.client.udp.UdpIO" level="WARN" />
+     <logger name="org.mbari.cthulhu.app.CthulhuApplication" level="WARN" />
+     <logger name="org.mbari.cthulhu.ui.player.MediaPlayerTimer" level="TRACE" />
 
     <root level="DEBUG">
         <appender-ref ref="STDOUT" />

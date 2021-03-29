@@ -123,6 +123,7 @@ public class AnnotationImageView extends ResizableImageView {
 
         double x = anchorX = event.getX();
         double y = anchorY = event.getY();
+        log.debug("mousePressed x={} y={}", x, y);
 
         dragRectangle.setX(x);
         dragRectangle.setY(y);
@@ -164,6 +165,8 @@ public class AnnotationImageView extends ResizableImageView {
         if (anchorX == -1) {
             return;
         }
+    
+        log.debug("mouseReleased dragRectangle: w={} h={}", dragRectangle.getWidth(), dragRectangle.getHeight());
 
         dragRectangle.setVisible(false);
         if (dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
@@ -191,16 +194,16 @@ public class AnnotationImageView extends ResizableImageView {
      * annotation's display.
      */
     private void newAnnotation() {
-        log.debug("newAnnotation()");
+        log.trace("newAnnotation()");
 
         BoundingBox displayBounds = new BoundingBox(dragRectangle.getX(), dragRectangle.getY(), dragRectangle.getWidth(), dragRectangle.getHeight());
-        log.debug("displayBounds={}", displayBounds);
+        log.trace("displayBounds={}", displayBounds);
 
         BoundingBox absoluteBounds = displayToAbsoluteBounds(dragRectangle);
-        log.debug("absoluteBounds={}", absoluteBounds);
+        log.trace("absoluteBounds={}", absoluteBounds);
 
         Annotation annotation = new Annotation(mousePressedTime, absoluteBounds);
-        log.debug("annotation={}", annotation);
+        log.trace("annotation={}", annotation);
 
         if (onNewAnnotation != null) {
             onNewAnnotation.accept(annotation);
@@ -210,7 +213,7 @@ public class AnnotationImageView extends ResizableImageView {
     }
 
     private void settingsChanged(Settings settings) {
-        log.debug("settingsChanged()");
+        log.trace("settingsChanged()");
 
         cursorRectangle.setVisible(settings.annotations().creation().enableCursor());
         cursorRectangle.setWidth(settings.annotations().creation().cursorSize());

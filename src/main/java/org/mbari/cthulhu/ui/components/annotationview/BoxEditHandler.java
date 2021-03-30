@@ -17,12 +17,17 @@ import java.util.UUID;
 /**
  * Helper for editing of existing box.
  */
-public abstract class BoxResizeHandler {
-    abstract void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y);
-    abstract void continueDragRectangle(double x, double y);
-    abstract void completeDragRectangle(UUID id);
+public class BoxEditHandler {
+    /**
+     * Interface for AnnotationImageView to react to events associated with the editing.
+     */
+    interface Listener {
+        void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y);
+        void continueDragRectangle(double x, double y);
+        void completeDragRectangle(UUID id);
+    }
 
-    private static final Logger log = LoggerFactory.getLogger(BoxResizeHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(BoxEditHandler.class);
 
     private final Circle[] corners = {
         createCornerHandle(),
@@ -31,13 +36,16 @@ public abstract class BoxResizeHandler {
         createCornerHandle()
     };
     
+    private final Listener listener;
+    
     // Non-null only when this handler is active
     private UUID id = null;
     
     /**
      * Create a helper instance.
      */
-    public BoxResizeHandler() {
+    public BoxEditHandler(Listener listener) {
+        this.listener = listener;
         registerEventHandlers();
     }
     
@@ -55,18 +63,20 @@ public abstract class BoxResizeHandler {
     }
     
     /**
-     * Set the box to be resized.
+     * Activate the dispatch.
      *
      * @param id   ID of associated annotation.
+     *             This will be notified upon completion of the editing.
      * @param b    Bounding box corresponding to associated rectangle.
      */
     void activateHandling(UUID id, BoundingBox b) {
         deactivateHandling();
 
         log.debug("activateHandling id={} b={}", id, b);
+        // set position of the 4 corners:
         double x1 = b.getMinX();
-        double x2 = b.getMaxX();
         double y1 = b.getMinY();
+        double x2 = b.getMaxX();
         double y2 = b.getMaxY();
         double[] xys = {x1, y1, x2, y1, x2, y2, x1, y2};
         for (int j = 0; j < xys.length; j += 2) {
@@ -115,17 +125,17 @@ public abstract class BoxResizeHandler {
                 final double height = Math.abs(corners[index].getCenterY() - anchorY);
                 final double x = event.getX();
                 final double y = event.getY();
-                startDragRectangle(anchorX, anchorY, width, height, x, y);
+                listener.startDragRectangle(anchorX, anchorY, width, height, x, y);
             }
             else if (event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
                 final double x = event.getX();
                 final double y = event.getY();
                 corners[index].setCenterX(x);
                 corners[index].setCenterY(y);
-                continueDragRectangle(corners[index].getCenterX(), corners[index].getCenterY());
+                listener.continueDragRectangle(x, y);
             }
             else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
-                completeDragRectangle(id);
+                listener.completeDragRectangle(id);
                 deactivateHandling();
             }
         }

@@ -15,13 +15,12 @@ import java.util.Collection;
 import java.util.UUID;
 
 /**
- * TODO
+ * Helper for editing of existing box.
  */
 public abstract class BoxResizeHandler {
     abstract void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y);
     abstract void continueDragRectangle(double x, double y);
-    abstract void completeDragRectangle(UUID id, boolean addAnnotation);
-    abstract void cancelDragRectangle();
+    abstract void completeDragRectangle(UUID id);
 
     private static final Logger log = LoggerFactory.getLogger(BoxResizeHandler.class);
 
@@ -32,9 +31,11 @@ public abstract class BoxResizeHandler {
         createCornerHandle()
     };
     
+    // Non-null only when this handler is active
     private UUID id = null;
     
     /**
+     * Create a helper instance.
      */
     public BoxResizeHandler() {
         registerEventHandlers();
@@ -55,8 +56,13 @@ public abstract class BoxResizeHandler {
     
     /**
      * Set the box to be resized.
+     *
+     * @param id   ID of associated annotation.
+     * @param b    Bounding box corresponding to associated rectangle.
      */
     void activateHandling(UUID id, BoundingBox b) {
+        deactivateHandling();
+
         log.debug("activateHandling id={} b={}", id, b);
         double x1 = b.getMinX();
         double x2 = b.getMaxX();
@@ -96,13 +102,17 @@ public abstract class BoxResizeHandler {
         
         @Override
         public void handle(MouseEvent event) {
+            if (!isActive()) {
+                return;
+            }
+
             //log.debug("CornerMouseEventHandler: index={} event={}", index, event);
             if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
                 final int oppositeCornerIndex = (index + 2) % 4;
                 final double anchorX = corners[oppositeCornerIndex].getCenterX();
                 final double anchorY = corners[oppositeCornerIndex].getCenterY();
-                double width = Math.abs(corners[index].getCenterX() - anchorX);
-                double height = Math.abs(corners[index].getCenterY() - anchorY);
+                final double width = Math.abs(corners[index].getCenterX() - anchorX);
+                final double height = Math.abs(corners[index].getCenterY() - anchorY);
                 final double x = event.getX();
                 final double y = event.getY();
                 startDragRectangle(anchorX, anchorY, width, height, x, y);
@@ -115,8 +125,7 @@ public abstract class BoxResizeHandler {
                 continueDragRectangle(corners[index].getCenterX(), corners[index].getCenterY());
             }
             else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
-                //cancelDragRectangle();
-                completeDragRectangle(id, true);
+                completeDragRectangle(id);
                 deactivateHandling();
             }
         }

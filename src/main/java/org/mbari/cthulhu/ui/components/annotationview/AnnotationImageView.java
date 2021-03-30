@@ -52,11 +52,8 @@ public class AnnotationImageView extends ResizableImageView {
         public void continueDragRectangle(double x, double y) {
             AnnotationImageView.this.continueDragRectangle(x, y);
         }
-        public void completeDragRectangle(UUID id, boolean addAnnotation) {
-            AnnotationImageView.this.completeDragRectangle(id, addAnnotation);
-        }
-        public void cancelDragRectangle() {
-            AnnotationImageView.this.cancelDragRectangle();
+        public void completeDragRectangle(UUID id) {
+            AnnotationImageView.this.completeDragRectangle(id);
         }
     };
     
@@ -195,24 +192,36 @@ public class AnnotationImageView extends ResizableImageView {
     }
 
     private void mouseReleased(MouseEvent event) {
-        completeDragRectangle(null, true);
+        completeDragRectangle(null);
     }
     
-    private void completeDragRectangle(UUID id, boolean addAnnotation) {
-        log.debug("completeDragRectangle: id={} addAnnotation={}", id, addAnnotation);
+    /**
+     * Completes a box being drawn.
+     * Handles brand-new box, or the editing of an existing box.
+     *
+     * @param id  `null` indicating this is a brand new box;
+     *            otherwise, the ID of existing box whose editing has just been completed.
+     */
+    private void completeDragRectangle(UUID id) {
+        log.debug("completeDragRectangle: id={}", id);
         if (anchorX == -1) {
             return;
         }
         dragRectangle.setVisible(false);
-        if (addAnnotation && dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
+        if (dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
             if (id != null) {
-                log.debug("completeDragRectangle: REMOVING id={}", id);
+                // first, remove existing box:
+                log.debug("completeDragRectangle: removing existing box with id={}", id);
                 remove(Collections.singleton(id));
-                // ALL PRELIMINARY
-                log.debug("completeDragRectangle: ADDING");
+                // notify the network sink:
+                application().localization().removeLocalization(id);
+
+                // then, add the just updated box:
+                log.debug("completeDragRectangle: adding the updated box");
                 Platform.runLater(this::newAnnotation);
             }
             else {
+                // this is a brand-new annotation:
                 newAnnotation();
             }
         }
@@ -221,12 +230,6 @@ public class AnnotationImageView extends ResizableImageView {
         anchorX = anchorY = -1d;
     }
     
-    private void cancelDragRectangle() {
-        dragRectangle.setVisible(false);
-        mousePressedTime = -1L;
-        anchorX = anchorY = -1d;
-    }
-
     private void keyPressed(KeyEvent event) {
         //log.debug("keyPressed: event={}", event);
         final KeyCode keyCode = event.getCode();

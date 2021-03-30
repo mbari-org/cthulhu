@@ -33,7 +33,7 @@ import static org.mbari.cthulhu.ui.components.annotationview.ResourceFactory.*;
  * Similarly, it is the responsibility of some other component to manage what annotations are shown, when, and for how
  * long.
  */
-public class AnnotationImageView extends ResizableImageView {
+public class AnnotationImageView extends ResizableImageView implements BoxEditHandler.Listener {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotationImageView.class);
 
@@ -45,17 +45,7 @@ public class AnnotationImageView extends ResizableImageView {
 
     private final Rectangle dragRectangle = createDragRectangle();
     
-    private final BoxResizeHandler boxResizeHandler = new BoxResizeHandler() {
-        public void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y) {
-            AnnotationImageView.this.startDragRectangle(anchorX, anchorY, width, height, x, y);
-        }
-        public void continueDragRectangle(double x, double y) {
-            AnnotationImageView.this.continueDragRectangle(x, y);
-        }
-        public void completeDragRectangle(UUID id) {
-            AnnotationImageView.this.completeDragRectangle(id);
-        }
-    };
+    private final BoxEditHandler boxEditHandler = new BoxEditHandler(this);
     
     private final PlayerComponent playerComponent;
 
@@ -95,7 +85,7 @@ public class AnnotationImageView extends ResizableImageView {
         this.playerComponent = playerComponent;
 
         getChildren().addAll(cursorRectangle, dragRectangle);
-        getChildren().addAll(boxResizeHandler.getComponents());
+        getChildren().addAll(boxEditHandler.getComponents());
 
         registerEventHandlers();
     }
@@ -114,11 +104,15 @@ public class AnnotationImageView extends ResizableImageView {
 
         application().settingsChanged().subscribe(this::settingsChanged);
     }
-    
+
+    // Deactivate box editing if media is resumed playing
     private void handleTimeChanged(long ignored) {
-        if (boxResizeHandler.isActive()) {
-            log.debug("handleTimeChanged: deactivating box resize handling");
-            boxResizeHandler.deactivateHandling();
+        if (boxEditHandler.isActive()) {
+            log.debug("handleTimeChanged: deactivating box edit handling");
+            boxEditHandler.deactivateHandling();
+            mousePressedTime = -1L;
+            anchorX = anchorY = -1d;
+            dragRectangle.setVisible(false);
         }
     }
     
@@ -146,7 +140,7 @@ public class AnnotationImageView extends ResizableImageView {
         startDragRectangle(x, y, 0, 0, x, y);
     }
     
-    private void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y) {
+    public void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y) {
         this.anchorX = anchorX;
         this.anchorY = anchorY;
         dragRectangle.setX(anchorX);
@@ -165,7 +159,7 @@ public class AnnotationImageView extends ResizableImageView {
         continueDragRectangle(x, y);
     }
     
-    private void continueDragRectangle(double x, double y) {
+    public void continueDragRectangle(double x, double y) {
         if (anchorX == -1) {
             return;
         }
@@ -202,7 +196,7 @@ public class AnnotationImageView extends ResizableImageView {
      * @param id  `null` indicating this is a brand new box;
      *            otherwise, the ID of existing box whose editing has just been completed.
      */
-    private void completeDragRectangle(UUID id) {
+    public void completeDragRectangle(UUID id) {
         log.debug("completeDragRectangle: id={}", id);
         if (anchorX == -1) {
             return;
@@ -230,34 +224,34 @@ public class AnnotationImageView extends ResizableImageView {
         anchorX = anchorY = -1d;
     }
     
+    public void cancelDragRectangle() {
+        dragRectangle.setVisible(false);
+        mousePressedTime = -1L;
+        anchorX = anchorY = -1d;
+    }
+    
     private void keyPressed(KeyEvent event) {
         //log.debug("keyPressed: event={}", event);
         final KeyCode keyCode = event.getCode();
 
-        if (dragRectangle.isVisible() && CANCEL_KEY_CODE == keyCode) {
-            dragRectangle.setVisible(false);
-            mousePressedTime = -1L;
-            anchorX = anchorY = -1d;
+        if (CANCEL_KEY_CODE == keyCode) {
+            cancelDragRectangle();
+            boxEditHandler.deactivateHandling();
         }
-        
-        dispatchEditResize(keyCode);
+        else if (EDIT_KEY_CODE == keyCode) {
+            startBoxEditHandling();
+        }
     }
     
     /**
-     * Dispatch key stroke related with box resize editing.
+     * Start box editing, only if media is paused, editing is not already happening,
+     * and only when one single annotation is currently selected.
      */
-    private void dispatchEditResize(KeyCode keyCode) {
-        if (keyCode == CANCEL_KEY_CODE) {
-            boxResizeHandler.deactivateHandling();
-            return;
-        }
-        if (keyCode != EDIT_KEY_CODE) {
-            return;
-        }
+    private void startBoxEditHandling() {
         if (playerComponent.mediaPlayer().status().isPlaying()) {
             return;
         }
-        if (boxResizeHandler.isActive()) {
+        if (boxEditHandler.isActive()) {
             return;
         }
         
@@ -276,7 +270,7 @@ public class AnnotationImageView extends ResizableImageView {
             double ly = annotationComponent.getLayoutY();
             Rectangle r = annotationComponent.getRectangle();
             BoundingBox bb = new BoundingBox(lx, ly, r.getWidth(), r.getHeight());
-            Platform.runLater(() -> boxResizeHandler.activateHandling(id, bb));
+            Platform.runLater(() -> boxEditHandler.activateHandling(id, bb));
         }
     }
 

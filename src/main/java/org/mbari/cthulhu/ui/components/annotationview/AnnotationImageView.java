@@ -3,6 +3,7 @@ package org.mbari.cthulhu.ui.components.annotationview;
 import javafx.application.Platform;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -15,19 +16,13 @@ import org.mbari.cthulhu.ui.player.PlayerComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.mbari.cthulhu.app.CthulhuApplication.application;
-import static org.mbari.cthulhu.ui.components.annotationview.ResourceFactory.createCursorRectangle;
-import static org.mbari.cthulhu.ui.components.annotationview.ResourceFactory.createDragRectangle;
+import static org.mbari.cthulhu.ui.components.annotationview.ResourceFactory.*;
 
 /**
  * A component that provides an interactive overlay for creating video annotations.
@@ -42,12 +37,29 @@ public class AnnotationImageView extends ResizableImageView {
 
     private static final Logger log = LoggerFactory.getLogger(AnnotationImageView.class);
 
-    private static final KeyCode CANCEL_DRAG_KEY_CODE = KeyCode.ESCAPE;
+    private static final KeyCode CANCEL_KEY_CODE = KeyCode.ESCAPE;
+    
+    private static final KeyCode EDIT_KEY_CODE = KeyCode.E;
 
     private final Rectangle cursorRectangle = createCursorRectangle();
 
     private final Rectangle dragRectangle = createDragRectangle();
-
+    
+    private final BoxResizeHandler boxResizeHandler = new BoxResizeHandler() {
+        public void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y) {
+            AnnotationImageView.this.startDragRectangle(anchorX, anchorY, width, height, x, y);
+        }
+        public void continueDragRectangle(double x, double y) {
+            AnnotationImageView.this.continueDragRectangle(x, y);
+        }
+        public void completeDragRectangle(UUID id, boolean addAnnotation) {
+            AnnotationImageView.this.completeDragRectangle(id, addAnnotation);
+        }
+        public void cancelDragRectangle() {
+            AnnotationImageView.this.cancelDragRectangle();
+        }
+    };
+    
     private final PlayerComponent playerComponent;
 
     /**
@@ -86,6 +98,7 @@ public class AnnotationImageView extends ResizableImageView {
         this.playerComponent = playerComponent;
 
         getChildren().addAll(cursorRectangle, dragRectangle);
+        getChildren().addAll(boxResizeHandler.getComponents());
 
         registerEventHandlers();
     }
@@ -99,10 +112,19 @@ public class AnnotationImageView extends ResizableImageView {
         imageView.setOnMouseReleased(this::mouseReleased);
 
         setOnKeyPressed(this::keyPressed);
+    
+        playerComponent.eventSource().time().subscribe(this::handleTimeChanged);
 
         application().settingsChanged().subscribe(this::settingsChanged);
     }
-
+    
+    private void handleTimeChanged(long ignored) {
+        if (boxResizeHandler.isActive()) {
+            log.debug("handleTimeChanged: deactivating box resize handling");
+            boxResizeHandler.deactivateHandling();
+        }
+    }
+    
     private void mouseEntered(MouseEvent event) {
         cursorRectangle.setVisible(application().settings().annotations().creation().enableCursor());
     }
@@ -118,27 +140,38 @@ public class AnnotationImageView extends ResizableImageView {
 
     private void mousePressed(MouseEvent event) {
         requestFocus();
-
+    
         mousePressedTime = playerComponent.mediaPlayer().status().time();
-
-        double x = anchorX = event.getX();
-        double y = anchorY = event.getY();
+    
+        double x = event.getX();
+        double y = event.getY();
         log.debug("mousePressed x={} y={}", x, y);
-
-        dragRectangle.setX(x);
-        dragRectangle.setY(y);
-        dragRectangle.setWidth(0);
-        dragRectangle.setHeight(0);
+        startDragRectangle(x, y, 0, 0, x, y);
+    }
+    
+    private void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y) {
+        this.anchorX = anchorX;
+        this.anchorY = anchorY;
+        dragRectangle.setX(anchorX);
+        dragRectangle.setY(anchorY);
+        dragRectangle.setWidth(width);
+        dragRectangle.setHeight(height);
         dragRectangle.setVisible(true);
-    };
+        dragRectangle.toFront();
+    
+        continueDragRectangle(x, y);
+    }
 
     private void mouseDragged(MouseEvent event) {
+        double x = event.getX();
+        double y = event.getY();
+        continueDragRectangle(x, y);
+    }
+    
+    private void continueDragRectangle(double x, double y) {
         if (anchorX == -1) {
             return;
         }
-
-        double x = event.getX();
-        double y = event.getY();
 
         // Constrain the drag rectangle the display bounds of the underlying video view
         Bounds videoViewBounds = videoViewBounds();
@@ -162,27 +195,85 @@ public class AnnotationImageView extends ResizableImageView {
     }
 
     private void mouseReleased(MouseEvent event) {
+        completeDragRectangle(null, true);
+    }
+    
+    private void completeDragRectangle(UUID id, boolean addAnnotation) {
+        log.debug("completeDragRectangle: id={} addAnnotation={}", id, addAnnotation);
         if (anchorX == -1) {
             return;
         }
-    
-        log.debug("mouseReleased dragRectangle: w={} h={}", dragRectangle.getWidth(), dragRectangle.getHeight());
-
         dragRectangle.setVisible(false);
-        if (dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
-            newAnnotation();
+        if (addAnnotation && dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
+            if (id != null) {
+                log.debug("completeDragRectangle: REMOVING id={}", id);
+                remove(Collections.singleton(id));
+                // ALL PRELIMINARY
+                log.debug("completeDragRectangle: ADDING");
+                Platform.runLater(this::newAnnotation);
+            }
+            else {
+                newAnnotation();
+            }
         }
 
         mousePressedTime = -1L;
         anchorX = anchorY = -1d;
     }
+    
+    private void cancelDragRectangle() {
+        dragRectangle.setVisible(false);
+        mousePressedTime = -1L;
+        anchorX = anchorY = -1d;
+    }
 
     private void keyPressed(KeyEvent event) {
-        if (dragRectangle.isVisible() && CANCEL_DRAG_KEY_CODE == event.getCode()) {
-            dragRectangle.setVisible(false);
+        //log.debug("keyPressed: event={}", event);
+        final KeyCode keyCode = event.getCode();
 
+        if (dragRectangle.isVisible() && CANCEL_KEY_CODE == keyCode) {
+            dragRectangle.setVisible(false);
             mousePressedTime = -1L;
             anchorX = anchorY = -1d;
+        }
+        
+        dispatchEditResize(keyCode);
+    }
+    
+    /**
+     * Dispatch key stroke related with box resize editing.
+     */
+    private void dispatchEditResize(KeyCode keyCode) {
+        if (keyCode == CANCEL_KEY_CODE) {
+            boxResizeHandler.deactivateHandling();
+            return;
+        }
+        if (keyCode != EDIT_KEY_CODE) {
+            return;
+        }
+        if (playerComponent.mediaPlayer().status().isPlaying()) {
+            return;
+        }
+        if (boxResizeHandler.isActive()) {
+            return;
+        }
+        
+        // get selected annotation components:
+        List<Node> annotationComponents = getChildren()
+            .filtered(child ->
+                (child instanceof AnnotationComponent) &&
+                ((AnnotationComponent) child).isSelected()
+            );
+
+        // for now, only handling one selection:
+        if (annotationComponents.size() == 1) {
+            AnnotationComponent annotationComponent = (AnnotationComponent) annotationComponents.get(0);
+            UUID id = annotationComponent.annotation().id();
+            double lx = annotationComponent.getLayoutX();
+            double ly = annotationComponent.getLayoutY();
+            Rectangle r = annotationComponent.getRectangle();
+            BoundingBox bb = new BoundingBox(lx, ly, r.getWidth(), r.getHeight());
+            Platform.runLater(() -> boxResizeHandler.activateHandling(id, bb));
         }
     }
 

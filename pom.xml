@@ -42,7 +42,7 @@
         <javaVersion>11</javaVersion>
         <mainClass>org.mbari.cthulhu.CthulhuLauncher</mainClass>
 
-        <guava.version>28.2-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <javafx.version>13.0.2</javafx.version>
         <jansi.version>1.18</jansi.version>
         <logback.version>1.3.0-alpha4</logback.version>

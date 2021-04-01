@@ -264,6 +264,15 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
         anchorX = anchorY = -1d;
     }
     
+    public void deleteDragRectangle(UUID id) {
+        if (id != null) {
+            log.debug("deleteDragRectangle: id={}", id);
+            remove(Collections.singleton(id));
+            application().localization().removeLocalization(id);
+        }
+        cancelDragRectangle();
+    }
+    
     public void cancelDragRectangle() {
         dragRectangle.setWidth(0);
         dragRectangle.setHeight(0);
@@ -282,6 +291,9 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
         }
         else if (EDIT_KEY_CODE == keyCode) {
             startBoxEditHandling();
+        }
+        else if (KeyCode.DELETE == keyCode && event.isShiftDown()) {
+            boxEditHandler.deleteRequested();
         }
     }
     

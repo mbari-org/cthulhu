@@ -29,6 +29,8 @@ public class BoxEditHandler {
         void moveDragRectangle(double x, double y, double w, double h);
         
         void completeDragRectangle(UUID id);
+        
+        void deleteDragRectangle(UUID id);
     }
 
     private static final Logger log = LoggerFactory.getLogger(BoxEditHandler.class);
@@ -120,6 +122,13 @@ public class BoxEditHandler {
         setCornersVisible(false);
         id = null;
         moveInfo = null;
+    }
+    
+    void deleteRequested() {
+        if (isActive()) {
+            listener.deleteDragRectangle(id);
+            deactivateHandling();
+        }
     }
     
     private void setCornersVisible(boolean visible) {

@@ -63,6 +63,7 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
 
     /**
      * Elapsed time in the video (in milliseconds) when the mouse button was pressed to start creating an annotation.
+     * Variable also used when starting to edit an existing box.
      */
     private long mousePressedTime;
 
@@ -131,13 +132,19 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
 
     private void mousePressed(MouseEvent event) {
         requestFocus();
-    
+
         mousePressedTime = playerComponent.mediaPlayer().status().time();
-    
         double x = event.getX();
         double y = event.getY();
-        log.debug("mousePressed x={} y={}", x, y);
-        startDragRectangle(x, y, 0, 0, x, y);
+        log.debug("mousePressed x={} y={} mousePressedTime={}", x, y, mousePressedTime);
+    
+        if (boxEditHandler.isActive()) {
+            boxEditHandler.mousePressed(x, y);
+        }
+        else {
+            // brand new box started to be drawn
+            startDragRectangle(x, y, 0, 0, x, y);
+        }
     }
     
     public void startDragRectangle(double anchorX, double anchorY, double width, double height, double x, double y) {
@@ -156,13 +163,16 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
     private void mouseDragged(MouseEvent event) {
         double x = event.getX();
         double y = event.getY();
-        continueDragRectangle(x, y);
+        if (boxEditHandler.isActive()) {
+            boxEditHandler.mouseDragged(x, y);
+        }
+        else {
+            log.debug("mouseDragged x={} y={}", x, y);
+            continueDragRectangle(x, y);
+        }
     }
     
     public void continueDragRectangle(double x, double y) {
-        if (anchorX == -1) {
-            return;
-        }
 
         // Constrain the drag rectangle the display bounds of the underlying video view
         Bounds videoViewBounds = videoViewBounds();
@@ -184,9 +194,25 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
         cursorRectangle.setX(x);
         cursorRectangle.setY(y);
     }
+    
+    public void moveDragRectangle(double x, double y, double w, double h) {
+        //log.debug("moveDragRectangle: x={} y={} w={} h={}", x, y, w, h);
+        dragRectangle.setX(x);
+        dragRectangle.setY(y);
+        dragRectangle.setWidth(w);
+        dragRectangle.setHeight(h);
+        dragRectangle.setVisible(true);
+        dragRectangle.toFront();
+    }
 
     private void mouseReleased(MouseEvent event) {
-        completeDragRectangle(null);
+        if (boxEditHandler.isActive()) {
+            boxEditHandler.mouseReleased();
+        }
+        else {
+            // possibly ending a brand new box
+            completeDragRectangle(null);
+        }
     }
     
     /**
@@ -197,10 +223,7 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
      *            otherwise, the ID of existing box whose editing has just been completed.
      */
     public void completeDragRectangle(UUID id) {
-        log.debug("completeDragRectangle: id={}", id);
-        if (anchorX == -1) {
-            return;
-        }
+        log.debug("completeDragRectangle: id={} mousePressedTime={}", id, mousePressedTime);
         dragRectangle.setVisible(false);
         if (dragRectangle.getWidth() > 0 && dragRectangle.getHeight() > 0) {
             if (id != null) {
@@ -209,15 +232,11 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
                 remove(Collections.singleton(id));
                 // notify the network sink:
                 application().localization().removeLocalization(id);
-
-                // then, add the just updated box:
-                log.debug("completeDragRectangle: adding the updated box");
-                Platform.runLater(this::newAnnotation);
+                // then, the just updated box is added below.
             }
-            else {
-                // this is a brand-new annotation:
-                newAnnotation();
-            }
+            // Else: it's a brand-new annotation.
+            
+            newAnnotation();
         }
 
         mousePressedTime = -1L;
@@ -225,6 +244,8 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
     }
     
     public void cancelDragRectangle() {
+        dragRectangle.setWidth(0);
+        dragRectangle.setHeight(0);
         dragRectangle.setVisible(false);
         mousePressedTime = -1L;
         anchorX = anchorY = -1d;
@@ -264,6 +285,8 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
 
         // for now, only handling one selection:
         if (annotationComponents.size() == 1) {
+            mousePressedTime = playerComponent.mediaPlayer().status().time();
+            // which should equal annotationComponent.annotation().startTime().
             AnnotationComponent annotationComponent = (AnnotationComponent) annotationComponents.get(0);
             UUID id = annotationComponent.annotation().id();
             double lx = annotationComponent.getLayoutX();
@@ -378,6 +401,7 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
     }
 
     public void select(List<UUID> annotations) {
+        boxEditHandler.deactivateHandling();
         log.debug("select(annotations={})", annotations);
         annotations.stream()
             .map(id -> annotationsById.get(id))
@@ -386,6 +410,7 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
     }
 
     public void deselect(List<UUID> annotations) {
+        boxEditHandler.deactivateHandling();
         log.debug("deselect(annotations={})", annotations);
         annotations.stream()
             .map(id -> annotationsById.get(id))

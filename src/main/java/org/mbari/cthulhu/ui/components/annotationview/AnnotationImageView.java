@@ -172,6 +172,11 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
         }
     }
     
+    /**
+     * Called in the case of creating a brand new box or resizing an existing one,
+     * so this is related with dragging a corner of the box.
+     * A constrain is applied so the rectangle is within the underlying video view.
+     */
     public void continueDragRectangle(double x, double y) {
 
         // Constrain the drag rectangle the display bounds of the underlying video view
@@ -195,8 +200,24 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
         cursorRectangle.setY(y);
     }
     
-    public void moveDragRectangle(double x, double y, double w, double h) {
+    /**
+     * Called in the case of repositioning an existing box.
+     * The rectangle is constrained to remain within the underlying video view.
+     */
+    public void moveDragRectangle(double x, double y, final double w, final double h) {
         //log.debug("moveDragRectangle: x={} y={} w={} h={}", x, y, w, h);
+        Bounds videoViewBounds = videoViewBounds();
+        int borderSize = application().settings().annotations().creation().borderSize();
+        
+        double maxX = videoViewBounds.getWidth() - borderSize;
+        double maxY = videoViewBounds.getHeight() - borderSize;
+    
+        x = Math.max(x, borderSize);
+        x = Math.min(x, maxX - w);
+        
+        y = Math.max(y, borderSize);
+        y = Math.min(y, maxY - h);
+        
         dragRectangle.setX(x);
         dragRectangle.setY(y);
         dragRectangle.setWidth(w);

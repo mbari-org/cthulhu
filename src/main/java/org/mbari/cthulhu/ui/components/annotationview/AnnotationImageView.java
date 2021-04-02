@@ -441,7 +441,7 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
             .forEach(annotationComponent -> annotationComponent.select(true));
 
         if (!boxEditHandler.isActive()) {
-            startBoxEditHandling();
+            Platform.runLater(this::startBoxEditHandling);
         }
     }
 

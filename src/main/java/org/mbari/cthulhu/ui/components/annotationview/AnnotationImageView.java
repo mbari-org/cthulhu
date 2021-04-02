@@ -434,12 +434,15 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
     }
 
     public void select(List<UUID> annotations) {
-        boxEditHandler.deactivateHandling();
         log.debug("select(annotations={})", annotations);
         annotations.stream()
             .map(id -> annotationsById.get(id))
             .filter(Objects::nonNull)
             .forEach(annotationComponent -> annotationComponent.select(true));
+
+        if (!boxEditHandler.isActive()) {
+            startBoxEditHandling();
+        }
     }
 
     public void deselect(List<UUID> annotations) {

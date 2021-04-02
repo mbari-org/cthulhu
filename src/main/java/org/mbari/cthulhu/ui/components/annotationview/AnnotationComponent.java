@@ -83,6 +83,10 @@ class AnnotationComponent extends Group {
         repositionComponents();
     }
 
+    final Rectangle getRectangle() {
+        return rectangle;
+    }
+    
     final void select(boolean select) {
         if (select) {
             this.selected = true;
@@ -98,6 +102,10 @@ class AnnotationComponent extends Group {
     final void settingsChanged() {
         select(this.selected);
         captionComponent.applySettings();
+    }
+
+    final boolean isSelected() {
+        return this.selected;
     }
 
     private void repositionComponents() {

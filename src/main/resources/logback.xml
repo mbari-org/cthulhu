@@ -27,7 +27,10 @@
         <appender-ref ref="STDOUT" />
     </logger>
 
-    <logger name="org.mbari.cthulhu.ui.components.annotationview.AnnotationImageView" level="WARN" />
+    <logger name="org.mbari.cthulhu.ui.components.annotationview.AnnotationImageView" level="DEBUG" />
+    <logger name="org.mbari.cthulhu.ui.components.annotationview.BoxEditHandler" level="DEBUG" />
+    <logger name="org.mbari.cthulhu.annotations.AnnotationController" level="INFO" />
+    <logger name="org.mbari.cthulhu.annotations.AnnotationManager" level="INFO" />
     <!-- <logger name="org.mbari.vcr4j.sharktopoda.client.udp.UdpIO" level="DEBUG" /> -->
      <logger name="org.mbari.cthulhu.app.CthulhuClientController" level="WARN" />
      <logger name="org.mbari.cthulhu.app.PlayerComponents" level="WARN" />

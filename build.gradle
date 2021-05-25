@@ -100,7 +100,7 @@ tasks.withType(JavaExec) {
 
 application {
     // mainClassName = "org.mbari.cthulhu/org.mbari.cthulhu.CthulhuLauncher"
-    mainClassName = "org.mbari.cthulhu.CthulhuLauncher"
+    mainClass = "org.mbari.cthulhu.CthulhuLauncher"
     applicationDefaultJvmArgs = runtimeJvmArgs
 }
 

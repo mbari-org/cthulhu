@@ -21,7 +21,7 @@ repositories {
         name = "MBARI"
         url = uri("https://maven.pkg.github.com/mbari-org/maven")
         credentials {
-            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USERNAME")
             password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
         }
     }
@@ -133,7 +133,6 @@ jlink {
 
         if  (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
             customInstallerOptions.addAll([
-                "--linux-package-name", "Kassogtha",
                 "--linux-menu-group", "VARS",
                 "--linux-deb-maintainer", "bschlining@gmail.com",
                 "--linux-shortcut"

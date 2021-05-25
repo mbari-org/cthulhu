@@ -33,12 +33,9 @@ You should _not_ rely on the stability of this repository and you are on your ow
 present time - force pushes may be used during this phase of development until the first formal delivery of code is
 made.
 
-Use Maven to build the application:
-```
-$mvn clean install
-```
+Follow the instructions at <https://github.com/mbari-org/maven> to configure access to MBARI's Github packages repository.
 
-Or use gradle to build packages:
+Use gradle to build packages:
 ```
 $gradlew clean jpackage --info
 ```

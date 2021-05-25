@@ -3,17 +3,14 @@ plugins {
     id 'com.adarshr.test-logger'
     id 'com.github.ben-manes.versions'
     id 'com.github.spotbugs'
-    id 'java'
-    id 'org.beryx.jlink'
-    id 'org.javamodularity.moduleplugin'
-    id 'org.kordamp.gradle.jdeps'
     id 'org.openjfx.javafxplugin'
+    id 'org.beryx.jlink'
 }
 
-version = "0.0.3"
+version = "1.0.0"
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 16
+targetCompatibility = 16
 
 repositories {
     mavenCentral()
@@ -21,9 +18,13 @@ repositories {
         url 'https://repo1.maven.org/maven2'
     }
     maven {
-        url 'https://dl.bintray.com/org-mbari/maven'
+        name = "MBARI"
+        url = uri("https://maven.pkg.github.com/mbari-org/maven")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+        }
     }
-    mavenLocal()
 }
 
 
@@ -59,7 +60,7 @@ dependencies {
     implementation 'uk.co.caprica:vlcj:4.7.1'
     runtimeOnly 'ch.qos.logback:logback-classic:1.3.0-alpha4' // 1.3.0-alpha5 does not colorize
     runtimeOnly 'org.fusesource.jansi:jansi:1.18'
-    testCompileOnly 'junit:junit:4.13'
+    testCompileOnly 'junit:junit:4.13.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testImplementation 'info.picocli:picocli:4.6.1'
     testImplementation 'info.picocli:picocli-shell-jline3:4.6.1'
@@ -98,12 +99,12 @@ tasks.withType(JavaExec) {
 
 
 application {
-    mainClassName = "org.mbari.cthulhu/org.mbari.cthulhu.CthulhuLauncher"
+    // mainClassName = "org.mbari.cthulhu/org.mbari.cthulhu.CthulhuLauncher"
+    mainClassName = "org.mbari.cthulhu.CthulhuLauncher"
     applicationDefaultJvmArgs = runtimeJvmArgs
 }
 
 jlink {
-    imageZip = file("$buildDir/image-zip/cthulhu.zip")
     options = [
             '--bind-services',
             '--strip-debug',
@@ -111,15 +112,6 @@ jlink {
             '--no-header-files',
             '--no-man-pages',
     ]
-
-    if(System.getenv("CI")) {
-        ["win", "linux", "mac"].each { name ->
-            targetPlatform(name) {
-                jdkHome = System.getenv("JDK_HOME_${name.toUpperCase()}")
-                addExtraModulePath(System.getenv("OPENJFX_MODS_${name.toUpperCase()}"))
-            }
-        }
-    }
 
     launcher {
         name = 'Cthulhu'
@@ -131,7 +123,6 @@ jlink {
     }
 
     jpackage {
-        jpackageHome = System.getenv("JPACKAGE_HOME")
 
         def customInstallerOptions = [
                 "--app-version", project.version,
@@ -141,8 +132,8 @@ jlink {
         ]
 
         if  (org.gradle.internal.os.OperatingSystem.current().isLinux()) {
-            installerType = "deb"
             customInstallerOptions.addAll([
+                "--linux-package-name", "Kassogtha",
                 "--linux-menu-group", "VARS",
                 "--linux-deb-maintainer", "bschlining@gmail.com",
                 "--linux-shortcut"
@@ -150,59 +141,67 @@ jlink {
             imageOptions = ["--icon", "src/jpackage/macos/Cthulhu.png"]
         }
         else if (org.gradle.internal.os.OperatingSystem.current().isWindows()) {
-            installerType = "msi"
+            customInstallerOptions.addAll([
+                "--win-upgrade-uuid", "3bfa1e7b-9d64-6107-adcb-738b71826967",
+                "--win-menu-group", "VARS",
+                "--win-menu"
+            ])
         }
         else {
             installerType = "dmg"
             customInstallerOptions.addAll([
                     "--mac-package-name", "Cthulhu",
-                    "--mac-package-identifier", project.name
+                    "--mac-package-identifier", "org.mbari.Cthulhu"
             ])
             imageOptions = ["--icon", "src/jpackage/macos/Cthulhu.icns"]
 
-            // def prefix = System.getenv("MAC_PACKAGE_SIGNING_PREFIX")
-            // def user=System.getenv("MAC_SIGNING_KEY_USER_NAME")
-            // if (prefix && user) {
-            //     customInstallerOptions.addAll([
-            //         "--mac-sign",
-            //         "--mac-package-signing-prefix", prefix,
-            //         "--mac-signing-key-user-name", user
-            //     ])
-            // }
-        }
-        installerOptions = customInstallerOptions
-
-    }
-
-}
-
-
-tasks.jpackageImage.doLast {
-    if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
-        def signer = System.getenv("MAC_CODE_SIGNER")
-        if (signer) {
-            exec {
-                println("MACOSX: Signing application")
-                workingDir "build/jpackage"
-
-                executable "codesign"
-
-                args "--entitlements", "${projectDir}/src/jpackage/macos/java.entitlements",
-                  "--options", "runtime", "--deep", "-vvv", "-f", "--sign", signer, 
-                  "Cthulhu.app"
+             /*
+                This is usually something like "Developer ID Application: My Awsome Org (0AB1C234D5)". The codesigner app uses the 
+                whole name, includeing "Developer ID Application", but jpackage only wants the section AFTER that. This section of
+                code handles either case and munges if needed to a jpackage friendly form.
+             */
+            def user = System.getenv("MAC_CODE_SIGNER")
+            def marker = "Developer ID Application:"
+            if (user.startsWith(marker)) {
+                user = user.substring(marker.length() + 1)
+            }
+            if (user) {
+                def homeDir = System.getenv("HOME")
+                customInstallerOptions.addAll([
+                    "--mac-sign",
+                    "--mac-signing-key-user-name", user,
+                    "--mac-signing-keychain", "$homeDir/Library/Keychains/login.keychain-db"
+                ])
             }
         }
+        installerOptions = customInstallerOptions
     }
+
 }
+
+
+// tasks.jpackageImage.doLast {
+//     if (org.gradle.internal.os.OperatingSystem.current().isMacOsX()) {
+//         def signer = System.getenv("MAC_CODE_SIGNER")
+//         if (signer) {
+//             exec {
+//                 println("MACOSX: Signing application")
+//                 workingDir "build/jpackage"
+
+//                 executable "codesign"
+
+//                 args "--entitlements", "${projectDir}/src/jpackage/macos/java.entitlements",
+//                   "--options", "runtime", "--deep", "-vvv", "-f", "--sign", signer, 
+//                   "Cthulhu.app"
+//             }
+//         }
+//     }
+// }
 
 task tree(type: DependencyReportTask) {}
 
 spotbugs {
     ignoreFailures = true
-}
-
-jdepsReport {
-    classpaths = ['compileClasspath', 'runtimeClasspath']
 }
 
 

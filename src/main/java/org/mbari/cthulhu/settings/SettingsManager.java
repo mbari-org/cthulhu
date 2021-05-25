@@ -42,6 +42,7 @@ final public class SettingsManager {
      */
     private SettingsManager() {
         this.settingsFile = new File(String.format("%s/%s", System.getProperty("user.home"), DEFAULT_SETTINGS_FILE));
+        log.debug("Settings file at {}", this.settingsFile );
     }
 
     /**
@@ -52,7 +53,11 @@ final public class SettingsManager {
     public Settings read() {
         log.debug("read()");
         try {
-            return new Gson().fromJson(new FileReader(settingsFile), Settings.class);
+            var settings = new Gson().fromJson(new FileReader(settingsFile), Settings.class);
+            if (settings == null) {
+                settings = createDefaults();
+            }
+            return settings;
         } catch (Exception e) {
             log.warn("Failed to load settings file, using defaults: {}", e.getMessage());
             return createDefaults();

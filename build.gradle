@@ -40,7 +40,7 @@ test {
 }
 
 javafx {
-    version = "17"
+    version = "17.0.1"
     modules = [
             'javafx.base',
             'javafx.controls',

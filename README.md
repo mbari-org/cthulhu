@@ -1,6 +1,6 @@
-![MBARI logo](docs/images/logo-mbari-3b.png)
-
 # Cthulhu
+
+![MBARI logo](docs/images/logo-mbari-3b.png)
 
 Cthulhu is a video playback and annotation application developed by the
 [Monterey Bay Aquarium Research Institute](https://mbari.org).
@@ -9,23 +9,21 @@ Cthulhu is a video playback and annotation application developed by the
 
 See <https://youtu.be/FKeuG8-UYC0> for a demonstration video.
 
-
 ## Status
 
 This is an in-development snapshot of an unfinished application. Significant functionality is present and working, but
 some features are still in progress.
 
-
 ## Requirements
 
 This application requires a [Java 11](https://adoptopenjdk.net/?variant=openjdk11&jvmVariant=hotspot) run-time
-environment. 
-
+environment.
 
 ## Building Cthulhu
 
 Getting the source:
-```
+
+```bash
 git clone git@github.com:caprica/cthulhu.git
 ```
 
@@ -36,28 +34,31 @@ made.
 Follow the instructions at <https://github.com/mbari-org/maven> to configure access to MBARI's Github packages repository.
 
 Use gradle to build packages:
-```
-$gradlew clean jpackage --info
-```
 
+```bash
+gradlew clean jpackage --info
+```
 
 ## Running Cthulhu
 
 Using Maven:
-```
-$mvn javafx:run
+
+```bash
+mvn javafx:run
 ```
 
 Using gradle:
-```
-$gradlew run
+
+```bash
+gradlew run
 ```
 
 ### Considerations if running on Linux
 
 An application that embeds LibVLC and uses a JavaFX/Swing file-open dialog can sometimes cause hard crashes, this can be
 mitigated by specifying the following on the command-line when starting the application:
-```
+
+```bash
 -DVLCJ_INITX=no
 ```
 
@@ -65,10 +66,9 @@ mitigated by specifying the following on the command-line when starting the appl
 
 Some minimal instructions for using Cthulhu...
 
-The application can function as a regular media player - you can open local files, paste clipboard contents to open 
-files (either a local filename or a URL), or drag a local file over the application to play it.
+The application can function as a regular media player - you can open local files, paste clipboard contents to open files (either a local filename or a URL), or drag a local file over the application to play it.
 
-The default network port for remote control is 5005 - commands sent to this port are _mostly_ implemented. 
+The default network port for remote control is 5005 - commands sent to this port are _mostly_ implemented.
 
 Jogging/skipping is implemented using global key-bindings, these are configurable in a configuration file at build
 time, but the defaults are:
@@ -89,7 +89,7 @@ Native frame advance is smooth, there is no native frame skip back.
 Some other basic media player functionality is provided by application menus.
 
 While the video is playing or paused, annotations can be created directly on top of the video by using the mouse to
-drag rectangles around areas of interest. 
+drag rectangles around areas of interest.
 
 Annotation positions and sizes are always recorded in the coordinate system of the video being played - they scale
 properly and maintain proper position as the window is resized.
@@ -105,7 +105,6 @@ The network interface is mostly working.
 
 A simple command-line driver test application is provided (see the project "test" sources) that can be used to test the
 interface.
-
 
 ## Technical Limitations
 
@@ -129,7 +128,6 @@ rendered JavaFX controls, buffer flickering and so on) - it is not common, but i
 
 When playing some ".mov" files, it is possible to deadlock the native media player and the application when trying to
 stop the media player during the application exit processing. Other file types appear to play, and stop, just fine.
-
 
 ## Copyright and Acknowledgements
 

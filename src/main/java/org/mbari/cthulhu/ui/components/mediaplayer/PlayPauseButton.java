@@ -68,7 +68,7 @@ final public class PlayPauseButton extends MediaPlayerToggleButton {
 
     @Override
     protected void onAction(MediaPlayer mediaPlayer) {
-        log.debug("stopped={}", stopped);
+        log.debug("stopped={}  mediaPlayer.status().time()={}", stopped, mediaPlayer.status().time());
         if (stopped) {
             // If the media player is stopped, then play() is used to restart the media from the beginning
             mediaPlayer().controls().play();

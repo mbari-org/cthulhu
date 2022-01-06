@@ -42,14 +42,14 @@
         <javaVersion>11</javaVersion>
         <mainClass>org.mbari.cthulhu.CthulhuLauncher</mainClass>
 
-        <guava.version>28.2-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <javafx.version>13.0.2</javafx.version>
         <jansi.version>1.18</jansi.version>
         <logback.version>1.3.0-alpha4</logback.version>
         <miglayout.version>5.2</miglayout.version>
         <rxjava.version>3.0.0</rxjava.version>
         <slf4j.version>2.0.0-alpha1</slf4j.version>
-        <vcr4j.version>4.3.2.jre11</vcr4j.version>
+        <vcr4j.version>4.4.1.jre11</vcr4j.version>
         <!-- <vcr4j.version>4.4.0.jre11-SNAPSHOT</vcr4j.version> -->
         <vlcj.version>4.4.4</vlcj.version>
         <vlcjFileFilters.version>2.0.0</vlcjFileFilters.version>
@@ -65,12 +65,12 @@
 
     <repositories>
         <repository>
-            <id>bintray-org-mbari-maven</id>
-            <name>org-mbari</name>
-            <url>https://dl.bintray.com/org-mbari/maven</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>
+            <id>github</id>
+            <name>github</name>
+            <url>https://maven.pkg.github.com/mbari-org/maven</url>
         </repository>
     </repositories>
 

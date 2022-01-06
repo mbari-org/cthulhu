@@ -91,7 +91,7 @@ final public class AnnotationController {
     }
 
     private void handleTimeChanged(long newTime) {
-        log.trace("handleTimeChanged(newTime={})", newTime);
+        log.trace("handleTimeChanged(newTime={}, diff={})", newTime, newTime - lastTime);
         lastTime = newTime;
         updateAnnotationView(newTime);
     }
@@ -270,7 +270,7 @@ final public class AnnotationController {
      */
     private long localizationDuration(Duration duration) {
 
-        int timeWindowMillis = application().settings().annotations().display().timeWindow() * 1000;
+        int timeWindowMillis = application().settings().annotations().display().timeWindowMillis();
         if (duration == null) {
             return timeWindowMillis;
         }
@@ -278,7 +278,7 @@ final public class AnnotationController {
             long toMillis = duration.toMillis();
             return toMillis > 0 ? toMillis : timeWindowMillis;
         }
-//        return toMillis > 0 ? toMillis : application().settings().annotations().display().timeWindow() * 1000;
+//        return toMillis > 0 ? toMillis : application().settings().annotations().display().timeWindowMillis() * 1000;
     }
 
     private void updateAnnotationView(long newTime) {

@@ -72,6 +72,10 @@ public class Annotation {
         this(UUID.randomUUID(), startTime, startTime, bounds, null);
     }
 
+    public Annotation(UUID id, long startTime, BoundingBox bounds) {
+        this(id, startTime, startTime, bounds, null);
+    }
+
     /**
      * Get the unique identifier for this video annotation.
      *

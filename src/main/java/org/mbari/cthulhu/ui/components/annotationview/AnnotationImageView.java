@@ -254,10 +254,16 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
                 // notify the network sink:
                 application().localization().removeLocalization(id);
                 // then, the just updated box is added below.
+
+                // TODO create a newAnnotation method that creates an annotation using an exising UUID
+                // (localization UUID which maps to a VARS association)
+                newAnnotation(id);
             }
-            // Else: it's a brand-new annotation.
-            
-            newAnnotation();
+            else {
+                // Else: it's a brand-new annotation.
+                newAnnotation();
+            }
+
         }
 
         mousePressedTime = -1L;
@@ -338,6 +344,10 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
      * annotation's display.
      */
     private void newAnnotation() {
+        newAnnotation(UUID.randomUUID());
+    }
+
+    private void newAnnotation(UUID id) {
         log.trace("newAnnotation()");
 
         BoundingBox displayBounds = new BoundingBox(dragRectangle.getX(), dragRectangle.getY(), dragRectangle.getWidth(), dragRectangle.getHeight());
@@ -346,7 +356,7 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
         BoundingBox absoluteBounds = displayToAbsoluteBounds(dragRectangle);
         log.trace("absoluteBounds={}", absoluteBounds);
 
-        Annotation annotation = new Annotation(mousePressedTime, absoluteBounds);
+        Annotation annotation = new Annotation(id, mousePressedTime, absoluteBounds);
         log.trace("annotation={}", annotation);
 
         if (onNewAnnotation != null) {

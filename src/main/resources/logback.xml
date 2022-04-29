@@ -21,6 +21,17 @@
     </appender> -->
 
     <!--
+       Mainly to separate org.mbari.vcr4j.sharktopoda.client.localization related logging
+       so, it's easier to inspect other things in the main output.
+    -->
+    <appender name="LOC" class="ch.qos.logback.core.FileAppender">
+        <file>sharktopoda-localization.log</file>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%-30thread] %-5level %-40logger{40} | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!--
         Category for log messages from the native (LibVLC) logger.
     -->
     <logger name="org.mbari.cthulhu.app.NativeLogHandler" level="OFF">
@@ -37,6 +48,10 @@
      <logger name="org.mbari.cthulhu.ui.player.PlayerComponent" level="WARN" />
      <logger name="org.mbari.cthulhu.ui.player.PlayerComponentStage" level="WARN" />
      <logger name="org.mbari.vcr4j.sharktopoda.client.udp.UdpIO" level="WARN" />
+     <logger name="org.mbari.vcr4j.sharktopoda" level="WARN" />
+     <logger name="org.mbari.vcr4j.sharktopoda.client.localization" level="DEBUG" additivity="false">
+       <appender-ref ref="LOC" />
+     </logger>
      <logger name="org.mbari.cthulhu.app.CthulhuApplication" level="WARN" />
      <logger name="org.mbari.cthulhu.ui.player.MediaPlayerTimer" level="TRACE" />
 

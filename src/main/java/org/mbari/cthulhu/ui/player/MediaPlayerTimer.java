@@ -32,11 +32,11 @@ final class MediaPlayerTimer {
     //        This also takes into account the "direction of time" based on reported
     //        mediaPlayer.status().time() values, which should help better reflect the
     //        changes when the user drags the time control back and forth during playing.
-    
+
     /**
      * A short period for this timer. At each tick, the given onTick consumer is called.
      */
-    private static final long PERIOD = 100;
+    private static final long PERIOD = 10;
 
     /**
      * Timer implementation.
@@ -47,7 +47,7 @@ final class MediaPlayerTimer {
      * Captures previously reported mediaPlayer.status().time()
      */
     private long previousMpMillis = -1;
-    
+
     /**
      * Captures system time when previousMpMillis is updated.
      */
@@ -58,18 +58,20 @@ final class MediaPlayerTimer {
      * reported mediaPlayer time difference.
      */
     private long timeDirection;
-    
+
     /**
      * Was media playing in previous call to the timer?
      */
     private boolean wasPlaying = false;
-    
-    /**
-     * Captures system time when timer was called. Only actually used for logging, this
-     * helps visualize how accurate the frequency of the calls are wrt intended PERIOD.
-     */
-    private long previousSysMillis = 0;
-    
+
+    // Note: underscore-prefixed variables below are for debugging purposes.
+    // For performance reasons, keep associated sections commented out
+    // (except of course locally as needed, and probably also in working
+    // branches to facilitate dev/testing)
+
+    private long _previousSysMillis = 0;
+    private long _previousMpMillis = 0;
+
     /**
      * Create a timer.
      *
@@ -80,47 +82,56 @@ final class MediaPlayerTimer {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
+                final boolean isPlaying = mediaPlayer.status().isPlaying();
                 final long newMpMillis = mediaPlayer.status().time();
-                
-                if (mediaPlayer.status().isPlaying()) {
-                    wasPlaying = true;
-                    
-                    // the value to use for onTick.accept
-                    long toCallTickMillis;
+                final long currSysMillis = System.currentTimeMillis();
 
-                    if (newMpMillis != previousMpMillis) {
-                        // mediaPlayer has reported a new value.
-                        timeDirection = newMpMillis > previousMpMillis ? +1 : -1;
-                        toCallTickMillis = previousMpMillis = newMpMillis;
-                        previousSysMillisForMp = System.currentTimeMillis();
-                    }
-                    else {
-                        // mediaPlayer has reported the same value as before.
-                        // Let's use last known time direction and system time difference for the onTick call:
-                        toCallTickMillis = previousMpMillis +
-                            timeDirection * (System.currentTimeMillis() - previousSysMillisForMp);
-                    }
-                    
-                    /*
-                    if (log.isTraceEnabled()) {
-                        final long sysDiffMillis = currSysMillis - previousSysMillis;
-                        previousSysMillis = currSysMillis;
-                        log.trace("onTick: toCallTickMillis={} newMpMillis={} timeDirection={} (sysDiff={})",
-                            toCallTickMillis, newMpMillis, timeDirection, sysDiffMillis
-                        );
-                    }
-                    */
+                if (log.isTraceEnabled()) {
+                  final long _sysDiffMillis = currSysMillis - _previousSysMillis;
+                  final long _mpDiffMillis = newMpMillis - _previousMpMillis;
+                  log.trace("{} _sysDiffMillis=({}) _mpDiffMillis=({}) newMpMillis={} ",
+                    isPlaying ? "PLAYING" : "       ",
+                    String.format("%3d", _sysDiffMillis),
+                    String.format("%3d", _mpDiffMillis),
+                    String.format("%6d", newMpMillis)
+                  );
+                  _previousSysMillis = currSysMillis;
+                  _previousMpMillis = newMpMillis;
+                }
 
+                // The value for the eventual call to onTick.accept:
+                long toCallTickMillis;
+                if (newMpMillis > 0 && newMpMillis != previousMpMillis) {
+                    // mediaPlayer has reported a new (non-zero) value.
+                    // first, some updates for possible handling in subsequent tick:
+                    timeDirection = newMpMillis > previousMpMillis ? +1 : -1;
+                    previousSysMillisForMp = currSysMillis;
+
+                    toCallTickMillis = previousMpMillis = newMpMillis;
+                }
+                else {
+                    if (timeDirection < 0) {
+                      // don't do the adjustment below in this case as it actually can result in a short
+                      // but noticeable weird behavior: boxes moving back in time for a little bit while
+                      // video resuming going forward. In any case, not doing anything here is ok given
+                      // the subsequent update in next calls.
+                      return;
+                    }
+                    // mediaPlayer has reported zero or the same value as before.
+                    // Use last known time direction and system time difference:
+                    toCallTickMillis = previousMpMillis +
+                        timeDirection * (currSysMillis - previousSysMillisForMp);
+                }
+
+                if (isPlaying) {
                     onTick.accept(toCallTickMillis);
                 }
                 else {
                     previousMpMillis = -1;
                     if (wasPlaying) {
-                        // Media just paused. Let's do one more call to the handler indicating
-                        // the time reported by the media player:
+                        // Media just paused. Let's do one more call:
                         wasPlaying = false;
-                        //log.trace("onTick: media just paused. Calling handler with newMpMillis={}", newMpMillis);
-                        onTick.accept(newMpMillis);
+                        onTick.accept(toCallTickMillis);
                     }
                 }
             }

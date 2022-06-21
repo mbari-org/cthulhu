@@ -2,6 +2,8 @@
 
     <timestamp key="timestamp" datePattern="yyyyMMdd'@'HH:mm:ss" />
 
+    <variable name="LOGBACK_LEVEL" value="${LOGBACK_LEVEL:-DEBUG}" />
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>true</withJansi>
         <encoder>
@@ -49,13 +51,13 @@
      <logger name="org.mbari.cthulhu.ui.player.PlayerComponentStage" level="WARN" />
      <logger name="org.mbari.vcr4j.sharktopoda.client.udp.UdpIO" level="WARN" />
      <logger name="org.mbari.vcr4j.sharktopoda" level="WARN" />
-     <logger name="org.mbari.vcr4j.sharktopoda.client.localization" level="DEBUG" additivity="false">
+     <logger name="org.mbari.vcr4j.sharktopoda.client.localization" level="INFO" additivity="false">
        <appender-ref ref="LOC" />
      </logger>
      <logger name="org.mbari.cthulhu.app.CthulhuApplication" level="WARN" />
      <logger name="org.mbari.cthulhu.ui.player.MediaPlayerTimer" level="TRACE" />
 
-    <root level="DEBUG">
+     <root level="${LOGBACK_LEVEL}">
         <appender-ref ref="STDOUT" />
         <!-- <appender-ref ref="FILE" />-->
     </root>

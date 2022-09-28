@@ -261,6 +261,7 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
             }
             else {
                 // Else: it's a brand-new annotation.
+            
                 newAnnotation();
             }
 
@@ -444,6 +445,7 @@ public class AnnotationImageView extends ResizableImageView implements BoxEditHa
     }
 
     public void select(List<UUID> annotations) {
+        boxEditHandler.deactivateHandling();
         log.debug("select(annotations={})", annotations);
         annotations.stream()
             .map(id -> annotationsById.get(id))

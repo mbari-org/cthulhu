@@ -12,10 +12,10 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.mbari.vcr4j.commands.SeekElapsedTimeCmd;
 import org.mbari.vcr4j.commands.VideoCommands;
+import org.mbari.vcr4j.commands.RemoteCommands;
 import org.mbari.vcr4j.sharktopoda.SharktopodaVideoIO;
 import org.mbari.vcr4j.sharktopoda.commands.FramecaptureCmd;
 import org.mbari.vcr4j.sharktopoda.commands.OpenCmd;
-import org.mbari.vcr4j.sharktopoda.commands.SharkCommands;
 import org.mbari.vcr4j.sharktopoda.decorators.FramecaptureDecorator;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
@@ -99,11 +99,11 @@ public class TestController {
     }
 
     static void show() {
-        videoIO.send(SharkCommands.SHOW);
+        videoIO.send(RemoteCommands.SHOW);
     }
 
     static void close() {
-        videoIO.send(SharkCommands.CLOSE);
+        videoIO.send(RemoteCommands.CLOSE);
     }
 
     static void play() {
@@ -116,7 +116,7 @@ public class TestController {
 
     public static void frameAdvance(Integer frames, Long delay) {
         for (int i = 0; i < frames; i++) {
-            videoIO.send(SharkCommands.FRAMEADVANCE);
+            videoIO.send(RemoteCommands.FRAMEADVANCE);
             if (i + 1 < frames) {
                 try {
                     Thread.sleep(delay);
@@ -140,11 +140,11 @@ public class TestController {
     }
 
     static void videoInfo() {
-        videoIO.send(SharkCommands.REQUEST_VIDEO_INFO);
+        videoIO.send(RemoteCommands.REQUEST_VIDEO_INFO);
     }
 
     static void videoInfos() {
-        videoIO.send(SharkCommands.REQUEST_ALL_VIDEO_INFOS);
+        videoIO.send(RemoteCommands.REQUEST_ALL_VIDEO_INFOS);
     }
 
     public static void main(String[] args) throws Exception {

@@ -49,8 +49,7 @@
         <miglayout.version>5.2</miglayout.version>
         <rxjava.version>3.0.0</rxjava.version>
         <slf4j.version>2.0.0-alpha1</slf4j.version>
-        <vcr4j.version>4.4.1.jre11</vcr4j.version>
-        <!-- <vcr4j.version>4.4.0.jre11-SNAPSHOT</vcr4j.version> -->
+        <vcr4j.version>5.2.0</vcr4j.version>
         <vlcj.version>4.4.4</vlcj.version>
         <vlcjFileFilters.version>2.0.0</vlcjFileFilters.version>
 
@@ -103,6 +102,21 @@
         </dependency>
         <dependency>
             <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-core</artifactId>
+            <version>${vcr4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-sharktopoda</artifactId>
+            <version>${vcr4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari.vcr4j</groupId>
+            <artifactId>vcr4j-remote</artifactId>
+            <version>${vcr4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mbari.vcr4j</groupId>
             <artifactId>vcr4j-sharktopoda-client</artifactId>
             <version>${vcr4j.version}</version>
         </dependency>
@@ -125,18 +139,11 @@
             <groupId>info.picocli</groupId>
             <artifactId>picocli-shell-jline3</artifactId>
             <version>${picocli.version}</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.jupiter.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mbari.vcr4j</groupId>
-            <artifactId>vcr4j-sharktopoda</artifactId>
-            <version>${vcr4j.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
